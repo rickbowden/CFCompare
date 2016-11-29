@@ -106,7 +106,7 @@ namespace CFComapre
                         sg.Properties.GroupDescription = prop.Value;
                         break;
                     case "VpcId":
-
+                        sg.Properties.VpcId = prop.Value;
                         break;
                     case "Tags":
 
@@ -193,11 +193,11 @@ namespace CFComapre
                 EC2SecurityGroup sg = new EC2SecurityGroup();                
                 sg.LogicalId = resource.LogicalResourceId;
                 sg.Type = "AWS::EC2::SecurityGroup";
-                sg.Properties.GroupDescription = group.Description;                
+                sg.Properties.GroupDescription = group.Description;
+                sg.Properties.VpcId = group.VpcId;
 
                 foreach (IpPermission perms in group.IpPermissions)
                 {
-
 
                     for (int i = 0; i < perms.IpRanges.Count; i++)
                     {
