@@ -12,6 +12,7 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -31,12 +32,16 @@ namespace CFComapre
         string stackName2 = "";
 
         const string tab1 = "    ";
-        const string tab2 = "        ";
-        const string tab3 = "            ";
-        const string tab4 = "                ";
+        const string tab2 = "            ";
+        const string tab3 = "                    ";
+        const string tab4 = "                            ";
 
+        CFStack Stack1 = null;
+        CFStack Stack2 = null;
+        CFStack CompareStack1 = null;
+        CFStack CompareStack2 = null;
 
-
+        bool CompareRemoves = true;
 
         public App()
         {
@@ -112,17 +117,23 @@ namespace CFComapre
         private void Go1_BTN_Click(object sender, EventArgs e)
         {            
             Go_Window1();
+            CompareStack1 = Stack1.DeepClone();
         }
         private void Go2_BTN_Click(object sender, EventArgs e)
         {
             Go_Window2();
+            CompareStack2 = Stack2.DeepClone();
         }
+
         private void Go_Window1()
         {
             if (inputsAreValid(source1_CB, profile1_CB, templateOrStack1_TB, validation1_LB))
             {
                 AmazonCloudFormationClient CFclient = null;
                 AmazonEC2Client EC2client = null;
+
+                Stack1 = new CFStack();
+                CompareStack1 = new CFStack();
 
                 try
                 {
@@ -145,18 +156,18 @@ namespace CFComapre
                                 {
                                     if (validateTemplate(jasonString1, CFclient))
                                     {
-                                        ProcessTemplate(jasonString1, richTextBox1);
+                                        ProcessTemplate(jasonString1, richTextBox1, templatePath1, Stack1);                                        
                                     }
                                 }
                                 else
                                 {
-                                    ProcessTemplate(jasonString1, richTextBox1);
+                                    ProcessTemplate(jasonString1, richTextBox1, templatePath1, Stack1);
                                 }
                             }
                             break;
                         case "AWS":
                             stackName1 = templateOrStack1_TB.Text.Trim();
-                            ProcessLiveStack(stackName1, CFclient, EC2client, richTextBox1);
+                            ProcessLiveStack(stackName1, CFclient, EC2client, richTextBox1, Stack1);
                             break;
                     }
                     profileName1 = profile1_CB.Text.Trim();
@@ -180,6 +191,9 @@ namespace CFComapre
                 AmazonCloudFormationClient CFclient = null;
                 AmazonEC2Client EC2client = null;
 
+                Stack2 = new CFStack();
+                CompareStack2 = new CFStack();
+
                 try
                 {
                     profileName2 = profile2_CB.Text;
@@ -201,18 +215,18 @@ namespace CFComapre
                                 {
                                     if (validateTemplate(jasonString2, CFclient))
                                     {
-                                        ProcessTemplate(jasonString2, richTextBox2);
+                                        ProcessTemplate(jasonString2, richTextBox2, templatePath2, Stack2);
                                     }
                                 }
                                 else
                                 {
-                                    ProcessTemplate(jasonString2, richTextBox2);
+                                    ProcessTemplate(jasonString2, richTextBox2, templatePath2, Stack2);
                                 }
                             }
                             break;
                         case "AWS":
                             stackName2 = templateOrStack2_TB.Text.Trim();
-                            ProcessLiveStack(stackName2, CFclient, EC2client, richTextBox2);
+                            ProcessLiveStack(stackName2, CFclient, EC2client, richTextBox2, Stack2);
                             break;
                     }
                     profileName2 = profile2_CB.Text.Trim();
@@ -233,10 +247,10 @@ namespace CFComapre
         {            
         }
 
-        private void ProcessTemplate(string jsonString, RichTextBox rtb)
+        private void ProcessTemplate(string jsonString, RichTextBox rtb, string path, CFStack stack)
         {
             //Stack From Template
-            CFStack stack = new CFStack();
+            
             var template = JsonConvert.DeserializeObject<dynamic>(jsonString);
             stack.Description = template.Description;
             //Process StackResources            
@@ -246,21 +260,19 @@ namespace CFComapre
             {
                 
             }
-            WriteOutput(stack, rtb);
+            WriteOutput(stack, rtb, "CF Template", path);
             
         }
 
 
-        private void ProcessLiveStack(string stackName, AmazonCloudFormationClient cfClient, AmazonEC2Client ec2Client, RichTextBox rtb)
+        private void ProcessLiveStack(string stackName, AmazonCloudFormationClient cfClient, AmazonEC2Client ec2Client, RichTextBox rtb, CFStack stack)
         {
-            //Stack From AWS
-            CFStack runningStack = new CFStack();
-
+            
             //Get Live Stack
             DescribeStacksRequest cfRequest = new DescribeStacksRequest();
             cfRequest.StackName = stackName;
             DescribeStacksResponse liveStack = cfClient.DescribeStacks(cfRequest);
-            runningStack.Description = liveStack.Stacks[0].Description;
+            stack.Description = liveStack.Stacks[0].Description;
             
 
             //Get Stack Resouces
@@ -289,25 +301,27 @@ namespace CFComapre
                 switch (liveStackResource.ResourceType)
                 {
                     case "AWS::EC2::SecurityGroup":
-                        AWSUtils.ProcessEC2SecurityGroupFromAWS(liveStackResource, runningStack, ec2Client, secGroupMap);
+                        AWSUtils.ProcessEC2SecurityGroupFromAWS(liveStackResource, stack, ec2Client, secGroupMap);
                         break;
                     default:
                         break;
                 }
 
             }
-            runningStack.Resources.Sort((a, b) => a.LogicalId.CompareTo(b.LogicalId));
+            stack.Resources.Sort((a, b) => a.LogicalId.CompareTo(b.LogicalId));
 
-            WriteOutput(runningStack, rtb);
+            WriteOutput(stack, rtb, "Live Stack", stackName);
         }
 
 
 
-        private void WriteOutput(CFStack s, RichTextBox rtb)
+        private void WriteOutput(CFStack s, RichTextBox rtb, string source, string name)
         {
             rtb.Clear();
 
-            
+            rtb.AppendText("Source: " + source); rtb.AppendText(Environment.NewLine);
+            rtb.AppendText("Name/Path: " + name); rtb.AppendText(Environment.NewLine); rtb.AppendText(Environment.NewLine);
+
             rtb.AppendText("Decription: " + s.Description); rtb.AppendText(Environment.NewLine);
 
             rtb.AppendText("Resources"); rtb.AppendText(Environment.NewLine);
@@ -326,8 +340,14 @@ namespace CFComapre
                         var ingressRules = group.Properties.SecurityGroupIngress.OrderBy(a => a.IpProtocol).ThenBy(a => a.ToPort).ThenBy(a => a.FromPort).ThenBy(a => a.CidrIp).ThenBy(a => a.SourceSecurityGroupId);
                         foreach (var ingressRule in ingressRules)
                         {
-                            rtb.AppendText(tab4); rtb.AppendText("Protocol: " + ingressRule.IpProtocol + " | ");
-                            
+                            if (ingressRule.State == null)
+                            {
+                                rtb.AppendText(tab4); rtb.AppendText("Protocol: " + ingressRule.IpProtocol + " | ");
+                            }
+                            else
+                            {
+                                rtb.AppendText(ingressRule.State); rtb.AppendText(tab3); rtb.AppendText("Protocol: " + ingressRule.IpProtocol + " | ");
+                            }
                             if (ingressRule.FromPort.Equals(ingressRule.ToPort, StringComparison.Ordinal))
                             {
                                 rtb.AppendText("Port Range: " + ingressRule.FromPort + " | ");
@@ -435,9 +455,112 @@ namespace CFComapre
             return result;
         }
 
-        
 
-        
 
+
+        private void compare_BTN_Click_1(object sender, EventArgs e)
+        {        
+           CompareStacks();
+        }
+
+        private void CompareStacks()
+        {
+            CompareStackDescription();
+            CompareStackResources();
+
+            WriteOutput(CompareStack1, richTextBox1, source1_CB.Text, templateOrStack1_TB.Text);
+            WriteOutput(CompareStack2, richTextBox2, source2_CB.Text, templateOrStack2_TB.Text);
+        }
+
+        private void CompareStackDescription()
+        {
+
+        }
+
+        private void CompareStackResources()
+        {
+            if (CompareStack1 == null || CompareStack2 == null) { return; }
+            if (Stack1 == null || Stack2 == null) { return; }
+
+            //var compareStack1Resources = CompareStack1.Resources;
+                        
+            foreach (var stack1Resource in Stack1.Resources)
+            {
+                var stack1LogicalId = stack1Resource.LogicalId;
+                //Find matching resource in Stack2
+                var stack2Resource = Stack2.Resources.Find(n => n != null && n.LogicalId == stack1LogicalId);
+                //Find matching resource in CompareStack1
+                var compareStack1Resource = CompareStack1.Resources.Find(n => n != null && n.LogicalId == stack1LogicalId);
+                var compareStack2Resource = CompareStack2.Resources.Find(n => n != null && n.LogicalId == stack1LogicalId);
+                if (stack2Resource != null) //Found Matching Resource
+                {
+                    switch ((String)stack1Resource.Type)
+                    {
+                        case "AWS::EC2::SecurityGroup":
+                              
+                            List<EC2SecurityGroupIngress> i1List = stack1Resource.Properties.SecurityGroupIngress;
+                            List<EC2SecurityGroupIngress> i2List = stack2Resource.Properties.SecurityGroupIngress;
+                            List<EC2SecurityGroupIngress> comparei1List = compareStack1Resource.Properties.SecurityGroupIngress;                            
+                            CompareSecurityGroups(stack1Resource, stack2Resource, compareStack1Resource, CompareStack1);
+                            CompareSecurityGroups(stack2Resource, stack1Resource, compareStack2Resource, CompareStack2);
+                            break;
+                    }
+                }
+                                
+            }
+        }
+
+        private void CompareSecurityGroups(EC2SecurityGroup resource1, EC2SecurityGroup resource2, EC2SecurityGroup compareResource, CFStack compareStack)
+        {
+            List<EC2SecurityGroupIngress> i1List = resource1.Properties.SecurityGroupIngress;
+            List<EC2SecurityGroupIngress> i2List = resource2.Properties.SecurityGroupIngress;
+            List<EC2SecurityGroupIngress> compareList = compareResource.Properties.SecurityGroupIngress;
+
+            foreach (EC2SecurityGroupIngress x in i1List)
+            {               
+                
+                var y = i2List.Find(n => n != null && n.CidrIp == x.CidrIp && n.FromPort == x.FromPort && n.ToPort == x.ToPort && n.IpProtocol == x.IpProtocol && n.SourceSecurityGroupId == x.SourceSecurityGroupId);
+                if (y == null)
+                {
+                    if (CompareRemoves) 
+                    { 
+                        x.State = "Removed";
+                    }
+                }
+                else
+                {
+                    if (CompareRemoves == true) {
+                        var z = compareList.Find(n => n != null && n.CidrIp == x.CidrIp && n.FromPort == x.FromPort && n.ToPort == x.ToPort && n.IpProtocol == x.IpProtocol && n.SourceSecurityGroupId == x.SourceSecurityGroupId);
+                        if (z != null)
+                        {
+                            compareList.Remove(z);
+                        }
+                    }
+                }
+            }
+
+            if (compareResource.Properties.SecurityGroupIngress.Count() == 0)
+            {
+                compareStack.Resources.Remove(compareResource);
+            }
+
+        }
+
+
+    }
+
+    public static class ExtensionMethods
+    {
+        // Deep clone
+        public static T DeepClone<T>(this T a)
+        {
+            using (MemoryStream stream = new MemoryStream())
+            {
+                BinaryFormatter formatter = new BinaryFormatter();
+                formatter.Serialize(stream, a);
+                stream.Position = 0;
+                return (T)formatter.Deserialize(stream);
+            }
+        }
     }
 }

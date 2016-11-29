@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(App));
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.toolStripMenuItem_Tools = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem_Options = new System.Windows.Forms.ToolStripMenuItem();
@@ -54,12 +55,14 @@
             this.source2_CB = new System.Windows.Forms.ComboBox();
             this.richTextBox2 = new System.Windows.Forms.RichTextBox();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
+            this.compare_BTN = new System.Windows.Forms.ToolStripButton();
             this.validateTemplate_CB = new System.Windows.Forms.CheckBox();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
+            this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -151,6 +154,7 @@
             // 
             // Go1_BTN
             // 
+            this.Go1_BTN.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.Go1_BTN.Location = new System.Drawing.Point(611, 6);
             this.Go1_BTN.Name = "Go1_BTN";
             this.Go1_BTN.Size = new System.Drawing.Size(75, 23);
@@ -196,6 +200,7 @@
             this.richTextBox1.Size = new System.Drawing.Size(671, 562);
             this.richTextBox1.TabIndex = 4;
             this.richTextBox1.Text = "";
+            this.richTextBox1.WordWrap = false;
             // 
             // profile1_LB
             // 
@@ -241,6 +246,7 @@
             // 
             // Go2_BTN
             // 
+            this.Go2_BTN.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.Go2_BTN.Location = new System.Drawing.Point(592, 6);
             this.Go2_BTN.Name = "Go2_BTN";
             this.Go2_BTN.Size = new System.Drawing.Size(75, 23);
@@ -328,19 +334,31 @@
             this.richTextBox2.Size = new System.Drawing.Size(650, 562);
             this.richTextBox2.TabIndex = 5;
             this.richTextBox2.Text = "";
+            this.richTextBox2.WordWrap = false;
             // 
             // toolStrip1
             // 
+            this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.compare_BTN});
             this.toolStrip1.Location = new System.Drawing.Point(0, 28);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(1384, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(1384, 27);
             this.toolStrip1.TabIndex = 7;
             this.toolStrip1.Text = "toolStrip1";
+            // 
+            // compare_BTN
+            // 
+            this.compare_BTN.Image = ((System.Drawing.Image)(resources.GetObject("compare_BTN.Image")));
+            this.compare_BTN.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.compare_BTN.Name = "compare_BTN";
+            this.compare_BTN.Size = new System.Drawing.Size(90, 24);
+            this.compare_BTN.Text = "Compare";
+            this.compare_BTN.Click += new System.EventHandler(this.compare_BTN_Click_1);
             // 
             // validateTemplate_CB
             // 
             this.validateTemplate_CB.AutoSize = true;
-            this.validateTemplate_CB.Location = new System.Drawing.Point(12, 31);
+            this.validateTemplate_CB.Location = new System.Drawing.Point(121, 31);
             this.validateTemplate_CB.Name = "validateTemplate_CB";
             this.validateTemplate_CB.Size = new System.Drawing.Size(161, 21);
             this.validateTemplate_CB.TabIndex = 8;
@@ -356,6 +374,7 @@
             this.Controls.Add(this.toolStrip1);
             this.Controls.Add(this.splitContainer1);
             this.Controls.Add(this.menuStrip1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "App";
             this.Text = "CFCompare";
             this.menuStrip1.ResumeLayout(false);
@@ -366,6 +385,8 @@
             this.splitContainer1.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
+            this.toolStrip1.ResumeLayout(false);
+            this.toolStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -400,6 +421,7 @@
         private System.Windows.Forms.RichTextBox richTextBox2;
         private System.Windows.Forms.Button Go1_BTN;
         private System.Windows.Forms.Button Go2_BTN;
+        private System.Windows.Forms.ToolStripButton compare_BTN;
     }
 }
 
