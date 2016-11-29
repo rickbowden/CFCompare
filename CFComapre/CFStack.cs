@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace CFComapre
 {
+    [Serializable]
     class CFStack
     {
         public string Description { get; set; }
@@ -20,6 +21,7 @@ namespace CFComapre
 
     //------------------------------------------------------------------------------------
 
+    [Serializable]
     class EC2SecurityGroup
     {
         public object LogicalId { get; set; }
@@ -31,9 +33,11 @@ namespace CFComapre
             Properties = new EC2SecurityGroupProperties();
         }
     }
+    [Serializable]
     class EC2SecurityGroupProperties
     {
         public string GroupDescription { get; set; }
+        public string VpcId { get; set; }
         public List<EC2SecurityGroupIngress> SecurityGroupIngress { get; set; }
 
         public EC2SecurityGroupProperties()
@@ -41,6 +45,7 @@ namespace CFComapre
             SecurityGroupIngress = new List<EC2SecurityGroupIngress>();
         }
     }
+    [Serializable]
     public class EC2SecurityGroupIngress
     {
         public string IpProtocol { get; set; }
@@ -49,15 +54,17 @@ namespace CFComapre
         public string CidrIp { get; set; }
         public string SourceSecurityGroupId { get; set; }
         public string SourceSecurityGroupName { get; set; }
-        public string GroupName { get; set; }
+        public string GroupName { get; set; }                           //Not AWS property
+        public string State { get; set; }                               //Not AWS property
     }
 
     //------------------------------------------------------------------------------------
-
+    [Serializable]
     class EC2Instance
     {
 
     }
+    [Serializable]
     class EC2InstanceProperties
     {
 
@@ -65,6 +72,7 @@ namespace CFComapre
 
     //------------------------------------------------------------------------------------
 
+    [Serializable]
     class IAMUser
     {
         public object LogicalId { get; set; }
@@ -76,6 +84,7 @@ namespace CFComapre
             Properties = new IAMUserProperties();
         }
     }
+    [Serializable]
     class IAMUserProperties
     {
         public string Path { get; set; }
@@ -86,6 +95,7 @@ namespace CFComapre
             Policies = new List<IAMUserPolicy>();
         }
     }
+    [Serializable]
     public class IAMUserPolicy
     {
         public string PolicyName { get; set; }
@@ -96,6 +106,7 @@ namespace CFComapre
             PolicyDocument = new IAMUserPolicyDocument();
         }
     }
+    [Serializable]
     public class IAMUserPolicyDocument
     {
         public List<IAMUserStatement> Statement { get; set; }
@@ -105,6 +116,7 @@ namespace CFComapre
             Statement = new List<IAMUserStatement>();
         }
     }
+    [Serializable]
     public class IAMUserStatement
     {
         public string Effect { get; set; }
