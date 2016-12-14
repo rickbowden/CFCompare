@@ -1,0 +1,11 @@
+﻿
+
+Limitations:
+
+	Only processes the following Template or Stack resources.
+		Security Groups.
+		Security Group Ingress Rules (Security Group must be defined in the template before any ingress rules).
+		Does not process tags.
+
+	Authentication
+		Currently only uses AWS profiles stored in the AWS SDK Store for .NET.

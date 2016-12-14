@@ -42,6 +42,10 @@ namespace CFComapre
         CFStack CompareStack2 = null;
 
         bool CompareRemoves = true;
+        bool ViewSwitch = false;
+
+        RichTextBox richTextBox1temp = new RichTextBox();
+        RichTextBox richTextBox2temp = new RichTextBox();
 
         public App()
         {
@@ -52,6 +56,7 @@ namespace CFComapre
             AWSConfigs.AWSRegion = "eu-west-1";
             PopulateProfileList(profile1_CB);
             PopulateProfileList(profile2_CB);
+            SwitchView_BTN.Enabled = false;
             
         }
 
@@ -256,11 +261,8 @@ namespace CFComapre
             //Process StackResources            
             AWSUtils.ProcessTemplateResources(template.Resources, stack);
             stack.Resources.Sort((a, b) => a.LogicalId.CompareTo(b.LogicalId));
-            foreach (var item in stack.Resources)
-            {
-                
-            }
-            WriteOutput(stack, rtb, "CF Template", path);
+            
+            WriteOutput(stack, rtb, source1_CB.Text, templateOrStack1_TB.Text);
             
         }
 
@@ -310,7 +312,7 @@ namespace CFComapre
             }
             stack.Resources.Sort((a, b) => a.LogicalId.CompareTo(b.LogicalId));
 
-            WriteOutput(stack, rtb, "Live Stack", stackName);
+            WriteOutput(stack, rtb, source1_CB.Text, templateOrStack1_TB.Text);
         }
 
 
@@ -459,8 +461,10 @@ namespace CFComapre
 
 
         private void compare_BTN_Click_1(object sender, EventArgs e)
-        {        
-           CompareStacks();
+        {            
+            CompareStacks();
+            ViewSwitch = true;
+            SwitchView_BTN.Enabled = true;
         }
 
         private void CompareStacks()
@@ -544,6 +548,22 @@ namespace CFComapre
                 compareStack.Resources.Remove(compareResource);
             }
 
+        }
+
+        private void SwitchView_BTN_Click(object sender, EventArgs e)
+        {
+            if (ViewSwitch == true)
+            {
+                WriteOutput(Stack1, richTextBox1, source1_CB.Text, templateOrStack1_TB.Text);
+                WriteOutput(Stack2, richTextBox2, source2_CB.Text, templateOrStack2_TB.Text);
+                ViewSwitch = false;
+            }
+            else if (ViewSwitch == false)
+            {
+                WriteOutput(CompareStack1, richTextBox1, "", "");
+                WriteOutput(CompareStack2, richTextBox2, "", "");
+                ViewSwitch = true;
+            }
         }
 
 

@@ -86,7 +86,16 @@ namespace CFComapre
             {
                 sgi.GroupName = rule.GroupId["Ref"].Value;
                 EC2SecurityGroup x = stack.Resources.Find(n => n != null && n.LogicalId == rule.GroupId["Ref"].Value);
-                x.Properties.SecurityGroupIngress.Add(sgi);
+                if (x != null)
+                {
+                    x.Properties.SecurityGroupIngress.Add(sgi);
+                }
+                else
+                {
+                    //TODO
+                    //Either remember and process orphaned ingress rule
+                    //Or write out to error log.
+                }
             }
         }
         
@@ -106,7 +115,8 @@ namespace CFComapre
                         sg.Properties.GroupDescription = prop.Value;
                         break;
                     case "VpcId":
-                        sg.Properties.VpcId = prop.Value;
+                        var a = prop.Value;
+                        sg.Properties.VpcId = a.Value;
                         break;
                     case "Tags":
 
