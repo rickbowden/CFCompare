@@ -47,6 +47,8 @@ namespace CFComapre
         RichTextBox richTextBox1temp = new RichTextBox();
         RichTextBox richTextBox2temp = new RichTextBox();
 
+        Dictionary<int, string> Protocols = Utils.Protocol();
+
         public App()
         {
             InitializeComponent();
@@ -369,6 +371,16 @@ namespace CFComapre
                             }
 
                             rtb.AppendText(Environment.NewLine);
+                        }
+                        break;
+                    case "AWS::EC2::NetworkAcl":
+                        NetworkAcl acl = (NetworkAcl)resource;
+                        rtb.AppendText(tab3); rtb.AppendText("VpcId: " + acl.Properties.VpcId); rtb.AppendText(Environment.NewLine);
+                        var aclEntry = acl.Properties.NetworkAclEntry.OrderBy(a => a.RuleNumber);
+                        foreach (var entry in aclEntry)
+                        {
+                            //Rule #, Type, Protocol, Port Range, Source, Allow/Deny
+
                         }
                         break;                    
                 }

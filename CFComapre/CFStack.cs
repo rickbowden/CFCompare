@@ -125,4 +125,42 @@ namespace CFComapre
     }
 
     //------------------------------------------------------------------------------------
+
+    [Serializable]
+    class NetworkAcl
+    {
+        public object LogicalId { get; set; }
+        public object Type { get; set; }
+        public NetworkAclProperties Properties { get; set; }
+
+        public NetworkAcl()
+        {
+            Properties = new NetworkAclProperties();
+        }
+    }
+    [Serializable]
+    class NetworkAclProperties
+    {
+        public string VpcId { get; set; }
+        public List<NetworkAclEntry> NetworkAclEntry { get; set; }
+
+        public NetworkAclProperties()
+        {
+            NetworkAclEntry = new List<NetworkAclEntry>();
+        }   
+    }
+    [Serializable]
+    public class NetworkAclEntry
+    {
+        public int Protocol { get; set; }
+        public string FromPort { get; set; }
+        public string ToPort { get; set; }
+        public string CidrBlock { get; set; }
+        public string NetworkAclId { get; set; }
+        public string RuleAction { get; set; }
+        public string RuleNumber { get; set; }
+        public bool Egress { get; set; }
+        public string Icmp { get; set; }
+    }
+    //------------------------------------------------------------------------------------
 }

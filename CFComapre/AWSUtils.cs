@@ -53,11 +53,107 @@ namespace CFComapre
                     case "AWS::EC2::SecurityGroupIngress":
                         ProcessEC2SecurityGroupIngressFromTemplate(resource, stack);
                         break;
+                    case "AWS::EC2::NetworkAcl":
+                        ProcessNetworkAclFromTemplate(resource, stack);
+                        break;
+                    case "AWS::EC2::NetworkAclEntry":
+                        ProcessNetworkAclEntryFromTemplate(resource, stack);
+                        break;
                     default:
                         break;
                 }
             }
 
+        }
+
+
+        static void ProcessNetworkAclEntryFromTemplate(dynamic input, CFStack stack)
+        {            
+            NetworkAclEntry ne = new NetworkAclEntry();
+
+            var rule = input.Value["Properties"];
+
+            ne.Protocol = (int)rule.Protocol;            
+            ne.CidrBlock = rule.CidrBlock;
+            ne.Egress = (bool)rule.Egress;
+            ne.RuleNumber = rule.RuleNumber;
+            ne.RuleAction = rule.RuleAction;
+
+
+            if (rule.NetworkAclId != null)
+            {
+                var a = rule.NetworkAclId;
+                foreach (var item in a)
+                {
+                    ne.NetworkAclId = item.Value;
+                }
+            }
+
+            if (rule.PortRange != null)
+            {
+                var range = rule.PortRange;
+                foreach (var item in range)
+                {
+                    if (item.Name == "To") { ne.ToPort = item.Value; }
+                    if (item.Name == "From") { ne.FromPort = item.Value; }
+                }
+            }
+
+            if (rule.Icmp != null)
+            {
+                var a = rule.Icmp;
+                                    
+                    foreach (var item in a)
+                    {
+                    //    ne.SourceSecurityGroupId = Id.Value;
+                    //}
+                }
+            }
+
+            //if (rule.GroupId != null)
+            //{
+            //    //ne.GroupName = rule.GroupId["Ref"].Value;
+            //    //EC2SecurityGroup x = stack.Resources.Find(n => n != null && n.LogicalId == rule.GroupId["Ref"].Value);
+            //    //if (x != null)
+            //    //{
+            //    //    x.Properties.SecurityGroupIngress.Add(sgi);
+            //    //}
+            //    //else
+            //    //{
+            //    //    //TODO
+            //    //    //Either remember and process orphaned ingress rule
+            //    //    //Or write out to error log.
+            //    //}
+            //}
+        }
+
+
+        static void ProcessNetworkAclFromTemplate(dynamic input, CFStack stack)
+        {   
+            NetworkAcl nacl = new NetworkAcl();
+
+            nacl.LogicalId = input.Name;
+            nacl.Type = "AWS::EC2::NetworkAcl";
+
+            var props = input.Value["Properties"];
+            foreach (var prop in props)
+            {
+                switch ((string)prop.Name)
+                {                    
+                    case "VpcId":
+                        var a = prop.Value;
+                        foreach (var item in a)
+                        {
+                            nacl.Properties.VpcId = item.Value;
+                        }                        
+                        break;
+                    case "Tags":
+
+                        break;                    
+                }
+            }
+
+            stack.Resources.Add(nacl);
         }
         
         static void ProcessEC2SecurityGroupIngressFromTemplate(dynamic input, CFStack stack)
