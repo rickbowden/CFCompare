@@ -33,6 +33,9 @@ namespace CFComapre
         }
 
 
+        // -----------------------------------------------------------------------
+        // Template
+
         public static void ProcessTemplateResources(dynamic input, CFStack stack)
         {
 
@@ -65,8 +68,7 @@ namespace CFComapre
             }
 
         }
-
-
+        
         static void ProcessNetworkAclEntryFromTemplate(dynamic input, CFStack stack)
         {            
             NetworkAclEntry ne = new NetworkAclEntry();
@@ -101,33 +103,26 @@ namespace CFComapre
 
             if (rule.Icmp != null)
             {
-                var a = rule.Icmp;
-                                    
-                    foreach (var item in a)
-                    {
-                    //    ne.SourceSecurityGroupId = Id.Value;
-                    //}
-                }
+                //May not be needed    
             }
 
-            //if (rule.GroupId != null)
-            //{
-            //    //ne.GroupName = rule.GroupId["Ref"].Value;
-            //    //EC2SecurityGroup x = stack.Resources.Find(n => n != null && n.LogicalId == rule.GroupId["Ref"].Value);
-            //    //if (x != null)
-            //    //{
-            //    //    x.Properties.SecurityGroupIngress.Add(sgi);
-            //    //}
-            //    //else
-            //    //{
-            //    //    //TODO
-            //    //    //Either remember and process orphaned ingress rule
-            //    //    //Or write out to error log.
-            //    //}
-            //}
+            if (ne.NetworkAclId != null)
+            {
+                NetworkAcl x = stack.Resources.Find(n => n != null && n.LogicalId == ne.NetworkAclId);
+                if (x != null)
+                {
+                    x.Properties.NetworkAclEntry.Add(ne);
+                }
+                else
+                {
+                    //TODO
+                    //Either remember and process orphaned ingress rule
+                    //Or write out to error log.
+                }
+            }
+                       
         }
-
-
+        
         static void ProcessNetworkAclFromTemplate(dynamic input, CFStack stack)
         {   
             NetworkAcl nacl = new NetworkAcl();
@@ -285,6 +280,51 @@ namespace CFComapre
                 }
             }
             stack.Resources.Add(u);
+        }
+
+
+        // -----------------------------------------------------------------------
+        // Live Stack
+
+        public static void ProcessNetworkAclFromAWS(StackResource resource, CFStack stack, AmazonEC2Client ec2Client)
+        {
+            DescribeNetworkAclsRequest naclRequest = new DescribeNetworkAclsRequest();
+            naclRequest.NetworkAclIds = new List<string> { resource.PhysicalResourceId };
+            
+            DescribeNetworkAclsResponse response = ec2Client.DescribeNetworkAcls(naclRequest);
+            foreach (Amazon.EC2.Model.NetworkAcl nacl in response.NetworkAcls)
+            {
+                NetworkAcl n = new NetworkAcl();
+                n.LogicalId = resource.LogicalResourceId;
+                n.Type = "AWS::EC2::NetworkAcl";
+                n.Properties.VpcId = nacl.VpcId;
+
+                foreach (Amazon.EC2.Model.NetworkAclEntry e in nacl.Entries)
+                {
+                    NetworkAclEntry ne = new NetworkAclEntry();
+                    ne.RuleNumber = e.RuleNumber.ToString();
+                    ne.CidrBlock = e.CidrBlock;
+                    ne.Egress = e.Egress;
+                    if (e.PortRange == null)
+                    {
+                        ne.FromPort = "ALL"; ne.ToPort = "ALL";
+                    }
+                    else
+                    {
+                        ne.FromPort = e.PortRange.From.ToString();
+                        ne.ToPort = e.PortRange.To.ToString();
+                    }
+                    ne.Protocol = Convert.ToInt32(e.Protocol);
+                    ne.RuleAction = e.RuleAction;
+                    //ICMP not included.
+
+                    n.Properties.NetworkAclEntry.Add(ne);
+                }
+
+                stack.Resources.Add(n);
+            }
+
+            
         }
 
 

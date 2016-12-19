@@ -161,6 +161,7 @@ namespace CFComapre
         public string RuleNumber { get; set; }
         public bool Egress { get; set; }
         public string Icmp { get; set; }
+        public string State { get; set; }                               //Not AWS property
     }
     //------------------------------------------------------------------------------------
 }
