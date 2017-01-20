@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ports>
+  <port number="-1">All</port>
+  <port number="1">ICMP</port>
+  <port number="6">TCP</port>
+  <port number="17">UDP</port>
+  <port number="22">SSH</port>
+  <port number="23">telnet</port>
+  <port number="25">SMTP</port>
+  <port number="42">nameserver</port>
+  <port number="53">DNS</port>
+  <port number="80">HTTP</port>
+  <port number="110">POP3</port>
+  <port number="389">LDAP</port>
+  <port number="465">SMTPS</port>
+  <port number="443">HTTPS</port>
+  <port number="993">IMAPS</port>
+  <port number="995">POPS3S</port>
+  <port number="1433">My SQL</port>
+  <port number="1521">ORACLE</port>
+  <port number="3306">MySQL/Aurora</port>
+  <port number="2049">NSF</port>
+  <port number="3389">RDP</port>
+  <port number="5432">PostgeSQL</port>
+  <port number="5439">Redshift</port>
+  <port number="5985">WinRM-HTTP</port>
+  <port number="5986">WinRM-HTTPS</port>
+  <port number="8080">HTTP*</port>
+  <port number="8443">HTTPS*</port>
+</ports>

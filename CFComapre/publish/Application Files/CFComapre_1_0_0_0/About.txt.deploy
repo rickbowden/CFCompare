@@ -1,0 +1,19 @@
+﻿[This app is still a work in progress]
+
+Limitations:
+
+	Only processes the following Template or Stack resources.
+		Security Groups.
+		Security Group Ingress Rules (Security Group must be defined in the template before any ingress rules).
+		Does not process tags.
+		NACLS.
+		The NACL must be defined in the template before the Ingress or Egress rules.
+
+	Authentication
+		Currently only uses AWS profiles stored in the AWS SDK Store for .NET.
+		Cross account role access could be possible if required.
+
+
+
+
+Version 1.0.0.0	- Initial release.
