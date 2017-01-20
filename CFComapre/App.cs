@@ -35,17 +35,21 @@ namespace CFComapre
         const string tab2 = "            ";
         const string tab3 = "                    ";
         const string tab4 = "                            ";
+        const string tab5 = "                                    ";
+        const string diffMarker = "*      ";
 
-        CFStack Stack1 = null;
-        CFStack Stack2 = null;
-        CFStack CompareStack1 = null;
-        CFStack CompareStack2 = null;
+        CFStack StackOriginal1 = null;
+        CFStack StackOriginal2 = null;
+        CFStack StackCopy1 = null;
+        CFStack StackCopy2 = null;
 
         bool CompareRemoves = true;
         bool ViewSwitch = false;
 
         RichTextBox richTextBox1temp = new RichTextBox();
         RichTextBox richTextBox2temp = new RichTextBox();
+
+        public static Dictionary<string, string> Protocols = Utils.Protocol();
 
         public App()
         {
@@ -113,6 +117,7 @@ namespace CFComapre
             {
                 cb.Items.Add(item.Name);
             }
+            cb.Sorted = true;
         }
 
 
@@ -121,13 +126,11 @@ namespace CFComapre
         ///GO
         private void Go1_BTN_Click(object sender, EventArgs e)
         {            
-            Go_Window1();
-            CompareStack1 = Stack1.DeepClone();
+            Go_Window1();            
         }
         private void Go2_BTN_Click(object sender, EventArgs e)
         {
-            Go_Window2();
-            CompareStack2 = Stack2.DeepClone();
+            Go_Window2();            
         }
 
         private void Go_Window1()
@@ -137,8 +140,8 @@ namespace CFComapre
                 AmazonCloudFormationClient CFclient = null;
                 AmazonEC2Client EC2client = null;
 
-                Stack1 = new CFStack();
-                CompareStack1 = new CFStack();
+                StackOriginal1 = new CFStack();
+                StackCopy1 = new CFStack();
 
                 try
                 {
@@ -161,25 +164,25 @@ namespace CFComapre
                                 {
                                     if (validateTemplate(jasonString1, CFclient))
                                     {
-                                        ProcessTemplate(jasonString1, richTextBox1, templatePath1, Stack1);                                        
+                                        ProcessTemplate(jasonString1, richTextBox1, templatePath1, StackOriginal1);                                        
                                     }
                                 }
                                 else
                                 {
-                                    ProcessTemplate(jasonString1, richTextBox1, templatePath1, Stack1);
+                                    ProcessTemplate(jasonString1, richTextBox1, templatePath1, StackOriginal1);
                                 }
                             }
                             break;
                         case "AWS":
                             stackName1 = templateOrStack1_TB.Text.Trim();
-                            ProcessLiveStack(stackName1, CFclient, EC2client, richTextBox1, Stack1);
+                            ProcessLiveStack(stackName1, CFclient, EC2client, richTextBox1, StackOriginal1);
                             break;
                     }
                     profileName1 = profile1_CB.Text.Trim();
                 }
                 catch (Exception ex)
                 {
-                    richTextBox1.Text = ex.Message;
+                    richTextBox1.Text = ex.Message + Environment.NewLine + ex.StackTrace; 
                 }
                 finally
                 {
@@ -196,8 +199,8 @@ namespace CFComapre
                 AmazonCloudFormationClient CFclient = null;
                 AmazonEC2Client EC2client = null;
 
-                Stack2 = new CFStack();
-                CompareStack2 = new CFStack();
+                StackOriginal2 = new CFStack();
+                StackCopy2 = new CFStack();
 
                 try
                 {
@@ -220,18 +223,18 @@ namespace CFComapre
                                 {
                                     if (validateTemplate(jasonString2, CFclient))
                                     {
-                                        ProcessTemplate(jasonString2, richTextBox2, templatePath2, Stack2);
+                                        ProcessTemplate(jasonString2, richTextBox2, templatePath2, StackOriginal2);
                                     }
                                 }
                                 else
                                 {
-                                    ProcessTemplate(jasonString2, richTextBox2, templatePath2, Stack2);
+                                    ProcessTemplate(jasonString2, richTextBox2, templatePath2, StackOriginal2);
                                 }
                             }
                             break;
                         case "AWS":
                             stackName2 = templateOrStack2_TB.Text.Trim();
-                            ProcessLiveStack(stackName2, CFclient, EC2client, richTextBox2, Stack2);
+                            ProcessLiveStack(stackName2, CFclient, EC2client, richTextBox2, StackOriginal2);
                             break;
                     }
                     profileName2 = profile2_CB.Text.Trim();
@@ -268,34 +271,37 @@ namespace CFComapre
 
 
         private void ProcessLiveStack(string stackName, AmazonCloudFormationClient cfClient, AmazonEC2Client ec2Client, RichTextBox rtb, CFStack stack)
-        {
-            
+        {            
             //Get Live Stack
             DescribeStacksRequest cfRequest = new DescribeStacksRequest();
             cfRequest.StackName = stackName;
             DescribeStacksResponse liveStack = cfClient.DescribeStacks(cfRequest);
             stack.Description = liveStack.Stacks[0].Description;
             
-
             //Get Stack Resouces
             DescribeStackResourcesRequest cfResourcesRequest = new DescribeStackResourcesRequest();
             cfResourcesRequest.StackName = stackName;
             DescribeStackResourcesResponse liveStackResources = cfClient.DescribeStackResources(cfResourcesRequest);
 
-            //Get SecurityGroups and map id to name
             Dictionary<string, string> secGroupMap = new Dictionary<string, string>();
-            DescribeSecurityGroupsRequest secGroupRequestAll = new DescribeSecurityGroupsRequest();
-
-            //Get all security group Id's and cf logicalId's (if any)
-            DescribeSecurityGroupsResponse secGroupResponseAll = ec2Client.DescribeSecurityGroups(secGroupRequestAll);
-            foreach (SecurityGroup sg in secGroupResponseAll.SecurityGroups)
+            var x = liveStackResources.StackResources.Find(n => n != null && n.ResourceType == "AWS::EC2::SecurityGroup");
+            if (x != null)
             {
-                string value = "none";
-                foreach (Amazon.EC2.Model.Tag tag in sg.Tags)
+                //Get SecurityGroups and map id to name
+                
+                DescribeSecurityGroupsRequest secGroupRequestAll = new DescribeSecurityGroupsRequest();
+                
+                //Get all security group Id's and cf logicalId's (if any)
+                DescribeSecurityGroupsResponse secGroupResponseAll = ec2Client.DescribeSecurityGroups(secGroupRequestAll);
+                foreach (SecurityGroup sg in secGroupResponseAll.SecurityGroups)
                 {
-                    if (tag.Key.Contains("aws:cloudformation:logical-id")) { value = tag.Value; }
+                    string value = "none";
+                    foreach (Amazon.EC2.Model.Tag tag in sg.Tags)
+                    {
+                        if (tag.Key.Contains("aws:cloudformation:logical-id")) { value = tag.Value; }
+                    }
+                    secGroupMap.Add(sg.GroupId, value);
                 }
-                secGroupMap.Add(sg.GroupId, value);
             }
 
             foreach (StackResource liveStackResource in liveStackResources.StackResources)
@@ -304,6 +310,9 @@ namespace CFComapre
                 {
                     case "AWS::EC2::SecurityGroup":
                         AWSUtils.ProcessEC2SecurityGroupFromAWS(liveStackResource, stack, ec2Client, secGroupMap);
+                        break;
+                    case "AWS::EC2::NetworkAcl":
+                        AWSUtils.ProcessNetworkAclFromAWS(liveStackResource, stack, ec2Client);
                         break;
                     default:
                         break;
@@ -339,45 +348,137 @@ namespace CFComapre
                     case "AWS::EC2::SecurityGroup":
                         EC2SecurityGroup group = (EC2SecurityGroup)resource;
                         rtb.AppendText(tab3); rtb.AppendText("Group Description: " + group.Properties.GroupDescription); rtb.AppendText(Environment.NewLine);
-                        var ingressRules = group.Properties.SecurityGroupIngress.OrderBy(a => a.IpProtocol).ThenBy(a => a.ToPort).ThenBy(a => a.FromPort).ThenBy(a => a.CidrIp).ThenBy(a => a.SourceSecurityGroupId);
-                        foreach (var ingressRule in ingressRules)
+                        var rules = group.Properties.SecurityGroupIngress.OrderBy(a => a.IpProtocol).ThenBy(a => a.ToPort).ThenBy(a => a.FromPort).ThenBy(a => a.CidrIp).ThenBy(a => a.SourceSecurityGroupId);
+                        foreach (var rule in rules)
                         {
-                            if (ingressRule.State == null)
+                            if (rule.StateChanged == false)
                             {
-                                rtb.AppendText(tab4); rtb.AppendText("Protocol: " + ingressRule.IpProtocol + " | ");
+                                rtb.AppendText(tab4); 
                             }
                             else
                             {
-                                rtb.AppendText(ingressRule.State); rtb.AppendText(tab3); rtb.AppendText("Protocol: " + ingressRule.IpProtocol + " | ");
+                                rtb.AppendText(diffMarker); rtb.AppendText(tab3);
                             }
-                            if (ingressRule.FromPort.Equals(ingressRule.ToPort, StringComparison.Ordinal))
+                                                        
+                            //Check if Protocol exists in Dictionary else use the number
+                            if (Protocols.ContainsKey(rule.IpProtocol))
                             {
-                                rtb.AppendText("Port Range: " + ingressRule.FromPort + " | ");
+                                rtb.AppendText("Protocol: " + Protocols[rule.IpProtocol] + " (" + rule.IpProtocol + ") | ");
                             }
                             else
                             {
-                                rtb.AppendText("Port Range: " + ingressRule.FromPort + "-" + ingressRule.ToPort + " | ");
+                                rtb.AppendText("Protocol: " + "Custom" + " (" + rule.IpProtocol + ") | ");
+                            }
+
+                            
+                            if (rule.FromPort.Equals(rule.ToPort, StringComparison.Ordinal))
+                            {        
+                                rtb.AppendText("Port Range: " + rule.FromPort + " | ");                                
+                            }
+                            else
+                            {       
+                                rtb.AppendText("Port Range: " + rule.FromPort + "-" + rule.ToPort + " | ");                                
                             }
                             
-                            if (ingressRule.CidrIp != null)
+
+                            if (rule.CidrIp != null)
                             {
-                                rtb.AppendText("Source: " + ingressRule.CidrIp);
+                                rtb.AppendText("Source: " + rule.CidrIp);
                             }
                             else
                             {
-                                rtb.AppendText("Source: " + ingressRule.SourceSecurityGroupId);
+                                rtb.AppendText("Source: " + rule.SourceSecurityGroupId);
                             }
 
                             rtb.AppendText(Environment.NewLine);
                         }
-                        break;                    
+                        break;
+                    case "AWS::EC2::NetworkAcl":
+                        NetworkAcl acl = (NetworkAcl)resource;
+                        rtb.AppendText(tab3); rtb.AppendText("VpcId: " + acl.Properties.VpcId); rtb.AppendText(Environment.NewLine);
+                        var aclEntry = acl.Properties.NetworkAclEntry.OrderBy(a => a.Egress).ThenBy(a => a.RuleNumber);
+                        bool egressDisplayed = false;
+                        bool ingressDisplayed = false;
+                        foreach (var rule in aclEntry)
+                        {
+                            //Rule #, Type, Protocol, Port Range, Source, Allow/Deny
+                            if (rule.Egress == false && ingressDisplayed == false)
+                            {     
+                                rtb.AppendText(tab4); rtb.AppendText("Inbound Rules"); rtb.AppendText(Environment.NewLine);
+                                ingressDisplayed = true;
+                            }
+                            else if (rule.Egress == true && egressDisplayed == false)
+                            {                                
+                                rtb.AppendText(tab4); rtb.AppendText("Outbound Rules"); rtb.AppendText(Environment.NewLine);
+                                egressDisplayed = true;
+                            }
+
+                            if (rule.StateChanged == false)
+                            {
+                                rtb.AppendText(tab5);
+                            }
+                            else
+                            {
+                                rtb.AppendText(diffMarker); rtb.AppendText(tab4);
+                            }
+
+                            rtb.AppendText("Rule: " + rule.RuleNumber + " | ");
+
+                            //Check if Protocol exists in Dictionary else use the number
+                            if (Protocols.ContainsKey(rule.Protocol))
+                            {
+                                rtb.AppendText("Protocol: " + Protocols[rule.Protocol] + " (" + rule.Protocol + ") | ");
+                            }
+                            else
+                            {
+                                rtb.AppendText("Protocol: " + "Custom" + " (" + rule.Protocol + ") | ");
+                            }
+
+                            //ALL ports could be 0-0 or -1 or 0-65535
+                            if (rule.FromPort.Equals(rule.ToPort, StringComparison.Ordinal))
+                            {
+                                if ((rule.FromPort == "0" && rule.ToPort == "0") || (rule.FromPort == "-1" && rule.ToPort == "-1"))
+                                {
+                                    rtb.AppendText("Port Range: ALL | ");
+                                }
+                                else
+                                {
+                                    rtb.AppendText("Port Range: " + rule.FromPort + " | ");
+                                }
+                            }
+                            else
+                            {
+                                if (rule.FromPort == "0" && rule.ToPort == "65535")
+                                {
+                                    rtb.AppendText("Port Range: ALL | ");
+                                }
+                                else
+                                {
+                                    rtb.AppendText("Port Range: " + rule.FromPort + "-" + rule.ToPort + " | ");
+                                }
+                            }
+                            rtb.AppendText("Source: " + rule.CidrBlock + " | ");
+                            rtb.AppendText("Allow/Deny: " + rule.RuleAction.ToUpper());
+                            rtb.AppendText(Environment.NewLine);
+                        }
+                        break;
                 }
 
                 rtb.AppendText(Environment.NewLine);
             }
-            foreach (var item in rtb.Lines)
-            {
-                
+
+            // Highlight Textbox Lines
+            for (int i = 0; i < rtb.Lines.Length; i++)			
+            {                
+                if (rtb.Lines[i].Contains("*"))
+                {
+                    int selectionStart = rtb.GetFirstCharIndexFromLine(i);
+                    int selectionEnd = rtb.Lines[i].Count();
+                    rtb.SelectionStart = selectionStart;
+                    rtb.SelectionLength = selectionEnd;
+                    rtb.SelectionBackColor = System.Drawing.Color.Yellow;
+
+                }
             }
             
         }
@@ -461,7 +562,16 @@ namespace CFComapre
 
 
         private void compare_BTN_Click_1(object sender, EventArgs e)
-        {            
+        {
+            if (StackOriginal1 == null || StackOriginal2 == null) { return; }
+            
+            ClearRTBBackgroundColour(richTextBox1);
+            ClearRTBBackgroundColour(richTextBox2);
+            CompareRemoves = toolStripMenuItem_CompareRemove.Checked;
+
+            StackCopy1 = StackOriginal1.DeepClone();
+            StackCopy2 = StackOriginal2.DeepClone();
+            
             CompareStacks();
             ViewSwitch = true;
             SwitchView_BTN.Enabled = true;
@@ -472,8 +582,8 @@ namespace CFComapre
             CompareStackDescription();
             CompareStackResources();
 
-            WriteOutput(CompareStack1, richTextBox1, source1_CB.Text, templateOrStack1_TB.Text);
-            WriteOutput(CompareStack2, richTextBox2, source2_CB.Text, templateOrStack2_TB.Text);
+            WriteOutput(StackCopy1, richTextBox1, source1_CB.Text, templateOrStack1_TB.Text);
+            WriteOutput(StackCopy2, richTextBox2, source2_CB.Text, templateOrStack2_TB.Text);
         }
 
         private void CompareStackDescription()
@@ -483,30 +593,30 @@ namespace CFComapre
 
         private void CompareStackResources()
         {
-            if (CompareStack1 == null || CompareStack2 == null) { return; }
-            if (Stack1 == null || Stack2 == null) { return; }
+            if (StackCopy1 == null || StackCopy2 == null) { return; }
+            if (StackOriginal1 == null || StackOriginal2 == null) { return; }
 
             //var compareStack1Resources = CompareStack1.Resources;
                         
-            foreach (var stack1Resource in Stack1.Resources)
+            foreach (var stack1Resource in StackOriginal1.Resources)
             {
                 var stack1LogicalId = stack1Resource.LogicalId;
                 //Find matching resource in Stack2
-                var stack2Resource = Stack2.Resources.Find(n => n != null && n.LogicalId == stack1LogicalId);
+                var stack2Resource = StackOriginal2.Resources.Find(n => n != null && n.LogicalId == stack1LogicalId);
                 //Find matching resource in CompareStack1
-                var compareStack1Resource = CompareStack1.Resources.Find(n => n != null && n.LogicalId == stack1LogicalId);
-                var compareStack2Resource = CompareStack2.Resources.Find(n => n != null && n.LogicalId == stack1LogicalId);
+                var compareStack1Resource = StackCopy1.Resources.Find(n => n != null && n.LogicalId == stack1LogicalId);
+                var compareStack2Resource = StackCopy2.Resources.Find(n => n != null && n.LogicalId == stack1LogicalId);
                 if (stack2Resource != null) //Found Matching Resource
                 {
                     switch ((String)stack1Resource.Type)
                     {
-                        case "AWS::EC2::SecurityGroup":
-                              
-                            List<EC2SecurityGroupIngress> i1List = stack1Resource.Properties.SecurityGroupIngress;
-                            List<EC2SecurityGroupIngress> i2List = stack2Resource.Properties.SecurityGroupIngress;
-                            List<EC2SecurityGroupIngress> comparei1List = compareStack1Resource.Properties.SecurityGroupIngress;                            
-                            CompareSecurityGroups(stack1Resource, stack2Resource, compareStack1Resource, CompareStack1);
-                            CompareSecurityGroups(stack2Resource, stack1Resource, compareStack2Resource, CompareStack2);
+                        case "AWS::EC2::SecurityGroup":                             
+                            CompareSecurityGroups(stack1Resource, stack2Resource, compareStack1Resource, StackCopy1);
+                            CompareSecurityGroups(stack2Resource, stack1Resource, compareStack2Resource, StackCopy2);
+                            break;
+                        case "AWS::EC2::NetworkAcl":                            
+                            CompareNetworkAcl(stack1Resource, stack2Resource, compareStack1Resource, StackCopy1);
+                            CompareNetworkAcl(stack2Resource, stack1Resource, compareStack2Resource, StackCopy2);
                             break;
                     }
                 }
@@ -514,27 +624,31 @@ namespace CFComapre
             }
         }
 
-        private void CompareSecurityGroups(EC2SecurityGroup resource1, EC2SecurityGroup resource2, EC2SecurityGroup compareResource, CFStack compareStack)
-        {
-            List<EC2SecurityGroupIngress> i1List = resource1.Properties.SecurityGroupIngress;
-            List<EC2SecurityGroupIngress> i2List = resource2.Properties.SecurityGroupIngress;
-            List<EC2SecurityGroupIngress> compareList = compareResource.Properties.SecurityGroupIngress;
 
-            foreach (EC2SecurityGroupIngress x in i1List)
-            {               
-                
-                var y = i2List.Find(n => n != null && n.CidrIp == x.CidrIp && n.FromPort == x.FromPort && n.ToPort == x.ToPort && n.IpProtocol == x.IpProtocol && n.SourceSecurityGroupId == x.SourceSecurityGroupId);
+        private void CompareNetworkAcl(NetworkAcl originalResource1, NetworkAcl originalResource2, NetworkAcl copyResource, CFStack copyStack)
+        {            
+            List<NetworkAclEntry> compareList = copyResource.Properties.NetworkAclEntry;
+
+            foreach (NetworkAclEntry x in originalResource1.Properties.NetworkAclEntry)
+            {
+                //Note NetworkAclId is always null for AWS stack resource
+                var y = originalResource2.Properties.NetworkAclEntry.Find(n => n != null && n.RuleNumber == x.RuleNumber && n.RuleAction == x.RuleAction && n.Egress.ToString() == x.Egress.ToString() && n.CidrBlock == x.CidrBlock && n.FromPort == x.FromPort && n.ToPort == x.ToPort && n.Protocol == x.Protocol);
                 if (y == null)
                 {
-                    if (CompareRemoves) 
-                    { 
-                        x.State = "Removed";
+                    if (CompareRemoves == false)
+                    {
+                        var z = copyResource.Properties.NetworkAclEntry.Find(n => n != null && n.RuleNumber == x.RuleNumber && n.RuleAction == x.RuleAction && n.Egress.ToString() == x.Egress.ToString() && n.CidrBlock == x.CidrBlock && n.FromPort == x.FromPort && n.ToPort == x.ToPort && n.Protocol == x.Protocol);
+                        if (z != null)
+                        {
+                            z.StateChanged = true;
+                        }
                     }
                 }
                 else
                 {
-                    if (CompareRemoves == true) {
-                        var z = compareList.Find(n => n != null && n.CidrIp == x.CidrIp && n.FromPort == x.FromPort && n.ToPort == x.ToPort && n.IpProtocol == x.IpProtocol && n.SourceSecurityGroupId == x.SourceSecurityGroupId);
+                    if (CompareRemoves == true)
+                    {
+                        var z = copyResource.Properties.NetworkAclEntry.Find(n => n != null && n.RuleNumber == x.RuleNumber && n.RuleAction == x.RuleAction && n.Egress.ToString() == x.Egress.ToString() && n.CidrBlock == x.CidrBlock && n.FromPort == x.FromPort && n.ToPort == x.ToPort && n.Protocol == x.Protocol);
                         if (z != null)
                         {
                             compareList.Remove(z);
@@ -543,29 +657,108 @@ namespace CFComapre
                 }
             }
 
-            if (compareResource.Properties.SecurityGroupIngress.Count() == 0)
+            if (copyResource.Properties.NetworkAclEntry.Count() == 0)
             {
-                compareStack.Resources.Remove(compareResource);
+                copyStack.Resources.Remove(copyResource);
+            }
+
+        }
+
+
+        private void CompareSecurityGroups(EC2SecurityGroup originalResource1, EC2SecurityGroup originalResource2, EC2SecurityGroup copyResource, CFStack copyStack)
+        {            
+            List<EC2SecurityGroupIngress> compareList = copyResource.Properties.SecurityGroupIngress;
+
+            foreach (EC2SecurityGroupIngress x in originalResource1.Properties.SecurityGroupIngress)
+            {
+
+                var y = originalResource2.Properties.SecurityGroupIngress.Find(n => n != null && n.CidrIp == x.CidrIp && n.FromPort == x.FromPort && n.ToPort == x.ToPort && n.IpProtocol == x.IpProtocol && n.SourceSecurityGroupId == x.SourceSecurityGroupId);
+                if (y == null)
+                {
+                    if (CompareRemoves == false) 
+                    {
+                        var z = copyResource.Properties.SecurityGroupIngress.Find(n => n != null && n.CidrIp == x.CidrIp && n.FromPort == x.FromPort && n.ToPort == x.ToPort && n.IpProtocol == x.IpProtocol && n.SourceSecurityGroupId == x.SourceSecurityGroupId);
+                        if (z != null)
+                        {
+                            z.StateChanged = true;
+                        }                        
+                    }
+                }
+                else
+                {
+                    if (CompareRemoves == true) {
+                        var z = copyResource.Properties.SecurityGroupIngress.Find(n => n != null && n.CidrIp == x.CidrIp && n.FromPort == x.FromPort && n.ToPort == x.ToPort && n.IpProtocol == x.IpProtocol && n.SourceSecurityGroupId == x.SourceSecurityGroupId);
+                        if (z != null)
+                        {
+                            copyResource.Properties.SecurityGroupIngress.Remove(z);
+                        }
+                    }
+                }
+            }
+
+            if (copyResource.Properties.SecurityGroupIngress.Count() == 0)
+            {
+                copyStack.Resources.Remove(copyResource);
             }
 
         }
 
         private void SwitchView_BTN_Click(object sender, EventArgs e)
         {
+            ClearRTBBackgroundColour(richTextBox1);
+            ClearRTBBackgroundColour(richTextBox2);
+
             if (ViewSwitch == true)
             {
-                WriteOutput(Stack1, richTextBox1, source1_CB.Text, templateOrStack1_TB.Text);
-                WriteOutput(Stack2, richTextBox2, source2_CB.Text, templateOrStack2_TB.Text);
+                WriteOutput(StackOriginal1, richTextBox1, source1_CB.Text, templateOrStack1_TB.Text);
+                WriteOutput(StackOriginal2, richTextBox2, source2_CB.Text, templateOrStack2_TB.Text);
                 ViewSwitch = false;
             }
             else if (ViewSwitch == false)
             {
-                WriteOutput(CompareStack1, richTextBox1, "", "");
-                WriteOutput(CompareStack2, richTextBox2, "", "");
+                WriteOutput(StackCopy1, richTextBox1, "", "");
+                WriteOutput(StackCopy2, richTextBox2, "", "");
                 ViewSwitch = true;
             }
         }
 
+
+
+
+
+        private void toolStripMenuItem_CompareRemove_Click(object sender, EventArgs e)
+        {
+            toolStripMenuItem_CompareHighlight.Checked = false;
+            if (toolStripMenuItem_CompareRemove.Checked == false) { toolStripMenuItem_CompareRemove.Checked = true; }
+        }
+
+        private void toolStripMenuItem_CompareHighlight_Click(object sender, EventArgs e)
+        {
+            toolStripMenuItem_CompareRemove.Checked = false;
+            if (toolStripMenuItem_CompareHighlight.Checked == false) { toolStripMenuItem_CompareHighlight.Checked = true; }
+        }
+
+        void ClearRTBBackgroundColour(RichTextBox rtb)
+        {
+            int selectionStart = rtb.GetFirstCharIndexFromLine(0);
+            rtb.SelectAll();
+            rtb.SelectionBackColor = SystemColors.Window;
+        }
+
+
+
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Form about = new AboutBox1();
+            about.ShowDialog();
+        }
+
+        private void versionInfoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Form versionInfo = new TextForm();
+            versionInfo.StartPosition = FormStartPosition.CenterScreen;
+            versionInfo.Show();
+        }
 
     }
 

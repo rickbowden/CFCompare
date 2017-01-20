@@ -34,7 +34,6 @@
             this.toolStripMenuItem_Options = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem_CompareRemove = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem_CompareHighlight = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripComboBox1 = new System.Windows.Forms.ToolStripComboBox();
             this.toolStripMenuItem_Help = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.versionInfoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -89,8 +88,7 @@
             // 
             this.toolStripMenuItem_Options.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripMenuItem_CompareRemove,
-            this.toolStripMenuItem_CompareHighlight,
-            this.toolStripComboBox1});
+            this.toolStripMenuItem_CompareHighlight});
             this.toolStripMenuItem_Options.Name = "toolStripMenuItem_Options";
             this.toolStripMenuItem_Options.Size = new System.Drawing.Size(73, 24);
             this.toolStripMenuItem_Options.Text = "Options";
@@ -101,22 +99,19 @@
             this.toolStripMenuItem_CompareRemove.CheckOnClick = true;
             this.toolStripMenuItem_CompareRemove.CheckState = System.Windows.Forms.CheckState.Checked;
             this.toolStripMenuItem_CompareRemove.Name = "toolStripMenuItem_CompareRemove";
-            this.toolStripMenuItem_CompareRemove.Size = new System.Drawing.Size(211, 24);
-            this.toolStripMenuItem_CompareRemove.Text = "Compare Removes";
+            this.toolStripMenuItem_CompareRemove.Size = new System.Drawing.Size(237, 24);
+            this.toolStripMenuItem_CompareRemove.Text = "Remove on Comparison";
+            this.toolStripMenuItem_CompareRemove.ToolTipText = "Removes entries that are the same on both sides during the compare operation.";
+            this.toolStripMenuItem_CompareRemove.Click += new System.EventHandler(this.toolStripMenuItem_CompareRemove_Click);
             // 
             // toolStripMenuItem_CompareHighlight
             // 
+            this.toolStripMenuItem_CompareHighlight.CheckOnClick = true;
             this.toolStripMenuItem_CompareHighlight.Name = "toolStripMenuItem_CompareHighlight";
-            this.toolStripMenuItem_CompareHighlight.Size = new System.Drawing.Size(211, 24);
-            this.toolStripMenuItem_CompareHighlight.Text = "Compare Highlights";
-            // 
-            // toolStripComboBox1
-            // 
-            this.toolStripComboBox1.Items.AddRange(new object[] {
-            "Compare Removes",
-            "Compare Highlights"});
-            this.toolStripComboBox1.Name = "toolStripComboBox1";
-            this.toolStripComboBox1.Size = new System.Drawing.Size(121, 28);
+            this.toolStripMenuItem_CompareHighlight.Size = new System.Drawing.Size(237, 24);
+            this.toolStripMenuItem_CompareHighlight.Text = "Highlight on Compare";
+            this.toolStripMenuItem_CompareHighlight.ToolTipText = "Highlights entries that are the same on both sides during the compare operation.";
+            this.toolStripMenuItem_CompareHighlight.Click += new System.EventHandler(this.toolStripMenuItem_CompareHighlight_Click);
             // 
             // toolStripMenuItem_Help
             // 
@@ -133,12 +128,14 @@
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
             this.aboutToolStripMenuItem.Size = new System.Drawing.Size(157, 24);
             this.aboutToolStripMenuItem.Text = "About";
+            this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
             // versionInfoToolStripMenuItem
             // 
             this.versionInfoToolStripMenuItem.Name = "versionInfoToolStripMenuItem";
             this.versionInfoToolStripMenuItem.Size = new System.Drawing.Size(157, 24);
             this.versionInfoToolStripMenuItem.Text = "Version Info";
+            this.versionInfoToolStripMenuItem.Click += new System.EventHandler(this.versionInfoToolStripMenuItem_Click);
             // 
             // splitContainer1
             // 
@@ -459,7 +456,6 @@
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem_Options;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem_CompareRemove;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem_CompareHighlight;
-        private System.Windows.Forms.ToolStripComboBox toolStripComboBox1;
         private System.Windows.Forms.ToolStripButton SwitchView_BTN;
         private System.Windows.Forms.ToolTip toolTip1;
     }

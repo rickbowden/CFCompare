@@ -1,7 +1,12 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)">
-  <Profiles>
-    <Profile Name="(Default)" />
-  </Profiles>
-  <Settings />
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="CFComapre.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="Author" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Rick Bowden</Value>
+    </Setting>
+    <Setting Name="AuthorEmail" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">apps@rickbowden.co.uk</Value>
+    </Setting>
+  </Settings>
 </SettingsFile>

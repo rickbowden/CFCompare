@@ -55,7 +55,7 @@ namespace CFComapre
         public string SourceSecurityGroupId { get; set; }
         public string SourceSecurityGroupName { get; set; }
         public string GroupName { get; set; }                           //Not AWS property
-        public string State { get; set; }                               //Not AWS property
+        public bool StateChanged { get; set; }                          //Not AWS property
     }
 
     //------------------------------------------------------------------------------------
@@ -124,5 +124,44 @@ namespace CFComapre
         public string Resource { get; set; }
     }
 
+    //------------------------------------------------------------------------------------
+
+    [Serializable]
+    class NetworkAcl
+    {
+        public object LogicalId { get; set; }
+        public object Type { get; set; }
+        public NetworkAclProperties Properties { get; set; }
+
+        public NetworkAcl()
+        {
+            Properties = new NetworkAclProperties();
+        }
+    }
+    [Serializable]
+    class NetworkAclProperties
+    {
+        public string VpcId { get; set; }
+        public List<NetworkAclEntry> NetworkAclEntry { get; set; }
+
+        public NetworkAclProperties()
+        {
+            NetworkAclEntry = new List<NetworkAclEntry>();
+        }   
+    }
+    [Serializable]
+    public class NetworkAclEntry
+    {
+        public string Protocol { get; set; }
+        public string FromPort { get; set; }
+        public string ToPort { get; set; }
+        public string CidrBlock { get; set; }
+        public string NetworkAclId { get; set; }
+        public string RuleAction { get; set; }
+        public string RuleNumber { get; set; }
+        public bool Egress { get; set; }
+        public string Icmp { get; set; }
+        public bool StateChanged { get; set; }                          //Not AWS property
+    }
     //------------------------------------------------------------------------------------
 }
