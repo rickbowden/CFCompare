@@ -55,7 +55,7 @@ namespace CFComapre
         public string SourceSecurityGroupId { get; set; }
         public string SourceSecurityGroupName { get; set; }
         public string GroupName { get; set; }                           //Not AWS property
-        public string State { get; set; }                               //Not AWS property
+        public bool StateChanged { get; set; }                          //Not AWS property
     }
 
     //------------------------------------------------------------------------------------
@@ -152,7 +152,7 @@ namespace CFComapre
     [Serializable]
     public class NetworkAclEntry
     {
-        public int Protocol { get; set; }
+        public string Protocol { get; set; }
         public string FromPort { get; set; }
         public string ToPort { get; set; }
         public string CidrBlock { get; set; }
@@ -161,7 +161,7 @@ namespace CFComapre
         public string RuleNumber { get; set; }
         public bool Egress { get; set; }
         public string Icmp { get; set; }
-        public string State { get; set; }                               //Not AWS property
+        public bool StateChanged { get; set; }                          //Not AWS property
     }
     //------------------------------------------------------------------------------------
 }

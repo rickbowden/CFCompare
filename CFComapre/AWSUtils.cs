@@ -9,11 +9,16 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace CFComapre
 {
     class AWSUtils
     {
+        static bool log = false;
+        static string logFile = "C:\\CFCompareLog.txt";
+        
+        
         /// <summary>
         /// Checks if the CloudFormation template is valid using the AWS API
         /// </summary>
@@ -32,7 +37,7 @@ namespace CFComapre
             return result;
         }
 
-
+        
         // -----------------------------------------------------------------------
         // Template
 
@@ -75,7 +80,7 @@ namespace CFComapre
 
             var rule = input.Value["Properties"];
 
-            ne.Protocol = (int)rule.Protocol;            
+            ne.Protocol = rule.Protocol;            
             ne.CidrBlock = rule.CidrBlock;
             ne.Egress = (bool)rule.Egress;
             ne.RuleNumber = rule.RuleNumber;
@@ -96,10 +101,42 @@ namespace CFComapre
                 var range = rule.PortRange;
                 foreach (var item in range)
                 {
-                    if (item.Name == "To") { ne.ToPort = item.Value; }
-                    if (item.Name == "From") { ne.FromPort = item.Value; }
+                    if (item.Name == "To")
+                    {
+                        if (item.Value == "-1")
+                        {
+                            ne.ToPort = "ALL";
+                        }
+                        else
+                        {
+                            ne.ToPort = item.Value; 
+                        }
+                    }
+                    if (item.Name == "From") 
+                    {
+                        if (item.Value == "-1")
+                        {
+                            ne.ToPort = "ALL";
+                        }
+                        else
+                        {
+                            ne.FromPort = item.Value;
+                        }
+                    }
                 }
             }
+            else //If port range is not specified in the template then AWS sets it to ALL
+            {
+                ne.FromPort = "ALL";
+                ne.ToPort = "ALL";
+            }
+
+            //Format PortRange
+            string from = "";
+            string to = "";
+            FormatPortRange(ne.FromPort, ne.ToPort, out from, out to);
+            ne.FromPort = from;
+            ne.ToPort = to;
 
             if (rule.Icmp != null)
             {
@@ -115,9 +152,11 @@ namespace CFComapre
                 }
                 else
                 {
-                    //TODO
-                    //Either remember and process orphaned ingress rule
-                    //Or write out to error log.
+//TODO
+//Either remember and process orphaned ingress rule
+//Or write out to error log.
+                    MessageBox.Show("Error", "Did not find NACL " + ne.NetworkAclId + " to add entry to", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                
                 }
             }
                        
@@ -157,9 +196,18 @@ namespace CFComapre
 
             var rule = input.Value["Properties"];
 
-            sgi.IpProtocol = rule.IpProtocol;
-            sgi.ToPort = rule.ToPort;
-            sgi.FromPort = rule.FromPort;
+            //FormatProtocol - Protocol could be a number or text (e.g. 6 or tcp)                         
+            sgi.IpProtocol = FormatProtocol(rule.IpProtocol.ToString());
+            //-------------------------------------------------------------------
+
+            //FormatPortRange - Port range could be 0-0 -1-1 0-65535
+            string from = "";
+            string to = "";
+            FormatPortRange(rule.FromPort.ToString(), rule.ToPort.ToString(), out from, out to);
+            sgi.FromPort = from;
+            sgi.ToPort = to;
+            //-------------------------------------------------------------------
+            
             sgi.CidrIp = rule.CidrIp;
             if (rule.SourceSecurityGroupId != null)
             {
@@ -183,9 +231,10 @@ namespace CFComapre
                 }
                 else
                 {
-                    //TODO
-                    //Either remember and process orphaned ingress rule
-                    //Or write out to error log.
+//TODO
+//Either remember and process orphaned ingress rule
+//Or write out to error log.
+                    MessageBox.Show("Error", "Did not find security group " + sgi.GroupName + " to add ingress rule to", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
@@ -218,9 +267,19 @@ namespace CFComapre
                         foreach (var rule in ingressRules)
                         {
                             EC2SecurityGroupIngress sgi = new EC2SecurityGroupIngress();
-                            sgi.IpProtocol = rule.IpProtocol;
-                            sgi.ToPort = rule.ToPort;
-                            sgi.FromPort = rule.FromPort;
+
+                            //FormatProtocol - Protocol could be a number or text (e.g. 6 or tcp)                         
+                            sgi.IpProtocol = FormatProtocol(rule.IpProtocol.ToString());
+                            //-------------------------------------------------------------------
+
+                            //FormatPortRange - Port range could be 0-0 -1-1 0-65535
+                            string from = "";
+                            string to = "";
+                            FormatPortRange(rule.FromPort.ToString(), rule.ToPort.ToString(), out from, out to);
+                            sgi.FromPort = from;
+                            sgi.ToPort = to;
+                            //-------------------------------------------------------
+
                             sgi.CidrIp = rule.CidrIp;
                             if (rule.SourceSecurityGroupId != null)
                             {
@@ -296,6 +355,7 @@ namespace CFComapre
             {
                 NetworkAcl n = new NetworkAcl();
                 n.LogicalId = resource.LogicalResourceId;
+                if (log) { Utils.WriteToFile(logFile, "AWS NACL: " + n.LogicalId.ToString(), true); }
                 n.Type = "AWS::EC2::NetworkAcl";
                 n.Properties.VpcId = nacl.VpcId;
 
@@ -311,14 +371,32 @@ namespace CFComapre
                     }
                     else
                     {
-                        ne.FromPort = e.PortRange.From.ToString();
-                        ne.ToPort = e.PortRange.To.ToString();
+                        //FormatPortRange - Port range could be 0-0 -1-1 0-65535
+                        string from = "";
+                        string to = "";
+                        FormatPortRange(e.PortRange.From.ToString(), e.PortRange.To.ToString(), out from, out to);
+                        ne.FromPort = from;
+                        ne.ToPort = to;
+                        //------------------------------------------------------
                     }
-                    ne.Protocol = Convert.ToInt32(e.Protocol);
+
+                    //FormatProtocol - Protocol could be a number or text (e.g. 6 or tcp) 
+                    ne.Protocol = FormatProtocol(e.Protocol);
+                    //-------------------------------------------------------------------
+
                     ne.RuleAction = e.RuleAction;
                     //ICMP not included.
 
                     n.Properties.NetworkAclEntry.Add(ne);
+
+                    if (e.PortRange == null)
+                    {
+                        if (log) { Utils.WriteToFile(logFile, ne.RuleNumber + " Protocol: " + e.Protocol + " | From: " + "null" + " To: " + "null", true); }
+                    }
+                    else
+                    {
+                        if (log) { Utils.WriteToFile(logFile, ne.RuleNumber + " Protocol: " + e.Protocol + " | From: " + e.PortRange.From.ToString() + " To: " + e.PortRange.To.ToString(), true); }
+                    }
                 }
 
                 stack.Resources.Add(n);
@@ -338,6 +416,7 @@ namespace CFComapre
             {       
                 EC2SecurityGroup sg = new EC2SecurityGroup();                
                 sg.LogicalId = resource.LogicalResourceId;
+                if (log) { Utils.WriteToFile(logFile, "AWS SG: " + sg.LogicalId.ToString(), true); }
                 sg.Type = "AWS::EC2::SecurityGroup";
                 sg.Properties.GroupDescription = group.Description;
                 sg.Properties.VpcId = group.VpcId;
@@ -348,18 +427,42 @@ namespace CFComapre
                     for (int i = 0; i < perms.IpRanges.Count; i++)
                     {
                         EC2SecurityGroupIngress sgi = new EC2SecurityGroupIngress();
-                        sgi.IpProtocol = perms.IpProtocol;
-                        sgi.FromPort = perms.FromPort.ToString();
-                        sgi.ToPort = perms.ToPort.ToString();
+
+                        //FormatProtocol - Protocol could be a number or text (e.g. 6 or tcp)                         
+                        sgi.IpProtocol = FormatProtocol(perms.IpProtocol);
+                        //--------------------------------------------------------------------
+
+                        //FormatPortRange - Port range could be 0-0 -1-1 0-65535
+                        //sgi.FromPort = perms.FromPort.ToString();
+                        //sgi.ToPort = perms.ToPort.ToString();
+                        string from = "";
+                        string to = "";
+                        FormatPortRange(perms.FromPort.ToString(), perms.ToPort.ToString(), out from, out to);
+                        sgi.FromPort = from;
+                        sgi.ToPort = to;
+                        //------------------------------------------------------
+
                         sgi.CidrIp = perms.IpRanges[i];
                         sg.Properties.SecurityGroupIngress.Add(sgi);
+
+                        if (log) { Utils.WriteToFile(logFile, " Protocol: " + perms.IpProtocol + " | From: " + perms.FromPort.ToString() + " To: " + perms.ToPort.ToString(), true); }
                     }
                     for (int i = 0; i < perms.UserIdGroupPairs.Count; i++)
                     {
                         EC2SecurityGroupIngress sgi = new EC2SecurityGroupIngress();
-                        sgi.IpProtocol = perms.IpProtocol;
-                        sgi.FromPort = perms.FromPort.ToString();
-                        sgi.ToPort = perms.ToPort.ToString();
+                        //FormatProtocol - Protocol could be a number or text (e.g. 6 or tcp)                         
+                        sgi.IpProtocol = FormatProtocol(perms.IpProtocol);
+                        //--------------------------------------------------------------------
+
+                        //FormatPortRange - Port range could be 0-0 -1-1 0-65535
+                        //sgi.FromPort = perms.FromPort.ToString();
+                        //sgi.ToPort = perms.ToPort.ToString();
+                        string from = "";
+                        string to = "";
+                        FormatPortRange(perms.FromPort.ToString(), perms.ToPort.ToString(), out from, out to);
+                        sgi.FromPort = from;
+                        sgi.ToPort = to;
+                        //-------------------------------------------------------
 
                         sg.Properties.SecurityGroupIngress.Add(sgi);
                         string groupName;
@@ -371,6 +474,8 @@ namespace CFComapre
                         {
                             sgi.SourceSecurityGroupId = perms.UserIdGroupPairs[i].GroupId;
                         }
+
+                        if (log) { Utils.WriteToFile(logFile, " Protocol: " + perms.IpProtocol + " | From: " + perms.FromPort.ToString() + " To: " + perms.ToPort.ToString(), true); }
                     }
 
                 }
@@ -378,5 +483,43 @@ namespace CFComapre
             }
         }
 
+
+        //Protocol could be a number or text (e.g. 6 or tcp) 
+        //Convert to string number using Protocols Dictionary
+        static string FormatProtocol(string input)
+        {
+            string result = input;
+            
+            foreach (string key in App.Protocols.Keys)
+            {
+                //Compare case insensitive
+                if (String.Compare(input, App.Protocols[key], true) == 0)
+                {
+                    result = key;
+                    break;
+                }
+            }
+
+            return result;
+        }
+
+
+        static void FormatPortRange(string from, string to, out string r1, out string r2)
+        {
+            r1 = "";
+            r2 = "";
+
+            if ((from == "0" && to == "0") || (from == "-1" && to == "-1") || (from == "0" && to == "65535"))
+            {
+                r1 = "ALL";
+                r2 = "ALL";
+            }
+            else
+            {
+                r1 = from;
+                r2 = to;
+            }
+                        
+        }
     }
 }

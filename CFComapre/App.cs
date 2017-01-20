@@ -36,6 +36,7 @@ namespace CFComapre
         const string tab3 = "                    ";
         const string tab4 = "                            ";
         const string tab5 = "                                    ";
+        const string diffMarker = "*      ";
 
         CFStack StackOriginal1 = null;
         CFStack StackOriginal2 = null;
@@ -48,7 +49,7 @@ namespace CFComapre
         RichTextBox richTextBox1temp = new RichTextBox();
         RichTextBox richTextBox2temp = new RichTextBox();
 
-        Dictionary<int, string> Protocols = Utils.Protocol();
+        public static Dictionary<string, string> Protocols = Utils.Protocol();
 
         public App()
         {
@@ -116,6 +117,7 @@ namespace CFComapre
             {
                 cb.Items.Add(item.Name);
             }
+            cb.Sorted = true;
         }
 
 
@@ -180,7 +182,7 @@ namespace CFComapre
                 }
                 catch (Exception ex)
                 {
-                    richTextBox1.Text = ex.Message;
+                    richTextBox1.Text = ex.Message + Environment.NewLine + ex.StackTrace; 
                 }
                 finally
                 {
@@ -349,22 +351,35 @@ namespace CFComapre
                         var rules = group.Properties.SecurityGroupIngress.OrderBy(a => a.IpProtocol).ThenBy(a => a.ToPort).ThenBy(a => a.FromPort).ThenBy(a => a.CidrIp).ThenBy(a => a.SourceSecurityGroupId);
                         foreach (var rule in rules)
                         {
-                            if (rule.State == null)
+                            if (rule.StateChanged == false)
                             {
-                                rtb.AppendText(tab4); rtb.AppendText("Protocol: " + rule.IpProtocol + " | ");
+                                rtb.AppendText(tab4); 
                             }
                             else
                             {
-                                rtb.AppendText(rule.State + "       "); rtb.AppendText(tab3); rtb.AppendText("Protocol: " + rule.IpProtocol + " | ");
+                                rtb.AppendText(diffMarker); rtb.AppendText(tab3);
                             }
+                                                        
+                            //Check if Protocol exists in Dictionary else use the number
+                            if (Protocols.ContainsKey(rule.IpProtocol))
+                            {
+                                rtb.AppendText("Protocol: " + Protocols[rule.IpProtocol] + " (" + rule.IpProtocol + ") | ");
+                            }
+                            else
+                            {
+                                rtb.AppendText("Protocol: " + "Custom" + " (" + rule.IpProtocol + ") | ");
+                            }
+
+                            
                             if (rule.FromPort.Equals(rule.ToPort, StringComparison.Ordinal))
-                            {
-                                rtb.AppendText("Port Range: " + rule.FromPort + " | ");
+                            {        
+                                rtb.AppendText("Port Range: " + rule.FromPort + " | ");                                
                             }
                             else
-                            {
-                                rtb.AppendText("Port Range: " + rule.FromPort + "-" + rule.ToPort + " | ");
+                            {       
+                                rtb.AppendText("Port Range: " + rule.FromPort + "-" + rule.ToPort + " | ");                                
                             }
+                            
 
                             if (rule.CidrIp != null)
                             {
@@ -388,24 +403,59 @@ namespace CFComapre
                         {
                             //Rule #, Type, Protocol, Port Range, Source, Allow/Deny
                             if (rule.Egress == false && ingressDisplayed == false)
-                            {
+                            {     
                                 rtb.AppendText(tab4); rtb.AppendText("Inbound Rules"); rtb.AppendText(Environment.NewLine);
                                 ingressDisplayed = true;
                             }
                             else if (rule.Egress == true && egressDisplayed == false)
-                            {
+                            {                                
                                 rtb.AppendText(tab4); rtb.AppendText("Outbound Rules"); rtb.AppendText(Environment.NewLine);
                                 egressDisplayed = true;
                             }
-                            rtb.AppendText(tab5); rtb.AppendText("Rule: " + rule.RuleNumber + " | ");
-                            rtb.AppendText("Protocol: " + Protocols[rule.Protocol] + " (" + rule.Protocol + ") | ");                
-                            if (rule.FromPort.Equals(rule.ToPort, StringComparison.Ordinal))
+
+                            if (rule.StateChanged == false)
                             {
-                                rtb.AppendText("Port Range: " + rule.FromPort + " | ");
+                                rtb.AppendText(tab5);
                             }
                             else
                             {
-                                rtb.AppendText("Port Range: " + rule.FromPort + "-" + rule.ToPort + " | ");
+                                rtb.AppendText(diffMarker); rtb.AppendText(tab4);
+                            }
+
+                            rtb.AppendText("Rule: " + rule.RuleNumber + " | ");
+
+                            //Check if Protocol exists in Dictionary else use the number
+                            if (Protocols.ContainsKey(rule.Protocol))
+                            {
+                                rtb.AppendText("Protocol: " + Protocols[rule.Protocol] + " (" + rule.Protocol + ") | ");
+                            }
+                            else
+                            {
+                                rtb.AppendText("Protocol: " + "Custom" + " (" + rule.Protocol + ") | ");
+                            }
+
+                            //ALL ports could be 0-0 or -1 or 0-65535
+                            if (rule.FromPort.Equals(rule.ToPort, StringComparison.Ordinal))
+                            {
+                                if ((rule.FromPort == "0" && rule.ToPort == "0") || (rule.FromPort == "-1" && rule.ToPort == "-1"))
+                                {
+                                    rtb.AppendText("Port Range: ALL | ");
+                                }
+                                else
+                                {
+                                    rtb.AppendText("Port Range: " + rule.FromPort + " | ");
+                                }
+                            }
+                            else
+                            {
+                                if (rule.FromPort == "0" && rule.ToPort == "65535")
+                                {
+                                    rtb.AppendText("Port Range: ALL | ");
+                                }
+                                else
+                                {
+                                    rtb.AppendText("Port Range: " + rule.FromPort + "-" + rule.ToPort + " | ");
+                                }
                             }
                             rtb.AppendText("Source: " + rule.CidrBlock + " | ");
                             rtb.AppendText("Allow/Deny: " + rule.RuleAction.ToUpper());
@@ -416,15 +466,17 @@ namespace CFComapre
 
                 rtb.AppendText(Environment.NewLine);
             }
+
+            // Highlight Textbox Lines
             for (int i = 0; i < rtb.Lines.Length; i++)			
-            {
+            {                
                 if (rtb.Lines[i].Contains("*"))
                 {
                     int selectionStart = rtb.GetFirstCharIndexFromLine(i);
-                    int selectionEnd = selectionStart + rtb.Width;
-                    rtb.SelectionBackColor = System.Drawing.Color.Yellow;
+                    int selectionEnd = rtb.Lines[i].Count();
                     rtb.SelectionStart = selectionStart;
-                    rtb.SelectionLength = rtb.Width;
+                    rtb.SelectionLength = selectionEnd;
+                    rtb.SelectionBackColor = System.Drawing.Color.Yellow;
 
                 }
             }
@@ -579,16 +631,16 @@ namespace CFComapre
 
             foreach (NetworkAclEntry x in originalResource1.Properties.NetworkAclEntry)
             {
-
-                var y = originalResource2.Properties.NetworkAclEntry.Find(n => n != null && n.RuleNumber == x.RuleNumber && n.RuleAction == x.RuleAction && n.Egress.ToString() == x.Egress.ToString() && n.CidrBlock == x.CidrBlock && n.FromPort == x.FromPort && n.ToPort == x.ToPort && n.Protocol == x.Protocol && n.NetworkAclId == x.NetworkAclId);
+                //Note NetworkAclId is always null for AWS stack resource
+                var y = originalResource2.Properties.NetworkAclEntry.Find(n => n != null && n.RuleNumber == x.RuleNumber && n.RuleAction == x.RuleAction && n.Egress.ToString() == x.Egress.ToString() && n.CidrBlock == x.CidrBlock && n.FromPort == x.FromPort && n.ToPort == x.ToPort && n.Protocol == x.Protocol);
                 if (y == null)
                 {
                     if (CompareRemoves == false)
                     {
-                        var z = copyResource.Properties.NetworkAclEntry.Find(n => n != null && n.RuleNumber == x.RuleNumber && n.RuleAction == x.RuleAction && n.Egress.ToString() == x.Egress.ToString() && n.CidrBlock == x.CidrBlock && n.FromPort == x.FromPort && n.ToPort == x.ToPort && n.Protocol == x.Protocol && n.NetworkAclId == x.NetworkAclId);
+                        var z = copyResource.Properties.NetworkAclEntry.Find(n => n != null && n.RuleNumber == x.RuleNumber && n.RuleAction == x.RuleAction && n.Egress.ToString() == x.Egress.ToString() && n.CidrBlock == x.CidrBlock && n.FromPort == x.FromPort && n.ToPort == x.ToPort && n.Protocol == x.Protocol);
                         if (z != null)
                         {
-                            z.State = "*";
+                            z.StateChanged = true;
                         }
                     }
                 }
@@ -596,7 +648,7 @@ namespace CFComapre
                 {
                     if (CompareRemoves == true)
                     {
-                        var z = copyResource.Properties.NetworkAclEntry.Find(n => n != null && n.RuleNumber == x.RuleNumber && n.RuleAction == x.RuleAction && n.Egress.ToString() == x.Egress.ToString() && n.CidrBlock == x.CidrBlock && n.FromPort == x.FromPort && n.ToPort == x.ToPort && n.Protocol == x.Protocol && n.NetworkAclId == x.NetworkAclId);
+                        var z = copyResource.Properties.NetworkAclEntry.Find(n => n != null && n.RuleNumber == x.RuleNumber && n.RuleAction == x.RuleAction && n.Egress.ToString() == x.Egress.ToString() && n.CidrBlock == x.CidrBlock && n.FromPort == x.FromPort && n.ToPort == x.ToPort && n.Protocol == x.Protocol);
                         if (z != null)
                         {
                             compareList.Remove(z);
@@ -628,7 +680,7 @@ namespace CFComapre
                         var z = copyResource.Properties.SecurityGroupIngress.Find(n => n != null && n.CidrIp == x.CidrIp && n.FromPort == x.FromPort && n.ToPort == x.ToPort && n.IpProtocol == x.IpProtocol && n.SourceSecurityGroupId == x.SourceSecurityGroupId);
                         if (z != null)
                         {
-                            z.State = "*";
+                            z.StateChanged = true;
                         }                        
                     }
                 }
@@ -691,6 +743,21 @@ namespace CFComapre
             int selectionStart = rtb.GetFirstCharIndexFromLine(0);
             rtb.SelectAll();
             rtb.SelectionBackColor = SystemColors.Window;
+        }
+
+
+
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Form about = new AboutBox1();
+            about.ShowDialog();
+        }
+
+        private void versionInfoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Form versionInfo = new TextForm();
+            versionInfo.StartPosition = FormStartPosition.CenterScreen;
+            versionInfo.Show();
         }
 
     }
