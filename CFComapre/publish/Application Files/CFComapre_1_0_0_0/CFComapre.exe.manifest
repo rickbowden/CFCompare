@@ -9,22 +9,22 @@
   <trustInfo>
     <security>
       <applicationRequestMinimum>
-        <PermissionSet Unrestricted="true" ID="Custom" SameSite="site" />
+        <PermissionSet version="1" class="System.Security.NamedPermissionSet" Name="LocalIntranet" Description="Default rights given to applications on the local intranet" Unrestricted="true" ID="Custom" SameSite="site" />
         <defaultAssemblyRequest permissionSetReference="Custom" />
       </applicationRequestMinimum>
       <requestedPrivileges xmlns="urn:schemas-microsoft-com:asm.v3">
-        <!--
-          UAC Manifest Options
-          If you want to change the Windows User Account Control level replace the 
-          requestedExecutionLevel node with one of the following.
+        <!-- UAC Manifest Options
+            If you want to change the Windows User Account Control level replace the 
+            requestedExecutionLevel node with one of the following.
 
         <requestedExecutionLevel  level="asInvoker" uiAccess="false" />
         <requestedExecutionLevel  level="requireAdministrator" uiAccess="false" />
         <requestedExecutionLevel  level="highestAvailable" uiAccess="false" />
 
-         If you want to utilize File and Registry Virtualization for backward 
-         compatibility then delete the requestedExecutionLevel node.
-    -->
+            Specifying requestedExecutionLevel node will disable file and registry virtualization.
+            If you want to utilize File and Registry Virtualization for backward 
+            compatibility then delete the requestedExecutionLevel node.
+        -->
         <requestedExecutionLevel level="asInvoker" uiAccess="false" />
       </requestedPrivileges>
     </security>
@@ -102,14 +102,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="CFComapre.exe" size="96768">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="CFComapre.exe" size="94208">
       <assemblyIdentity name="CFComapre" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>/uakc2qwrtmagmJutk3QWx/82F7D1wtyYNG0YwFHLl0=</dsig:DigestValue>
+        <dsig:DigestValue>ke6cB7vTjhxVPH7H9ccBD89dEq821J8MnEezAvFiwgc=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -125,13 +125,13 @@
       </hash>
     </dependentAssembly>
   </dependency>
-  <file name="About.txt" size="559">
+  <file name="About.txt" size="778">
     <hash>
       <dsig:Transforms>
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>awuS0BwM5BKjEpwSb0Waw6q0IZ4jEGEySkH9S0I+66g=</dsig:DigestValue>
+      <dsig:DigestValue>eSpfdHeWstVFSLeccOk8hd/zgXDc+O2bLgxfwYrFuoI=</dsig:DigestValue>
     </hash>
   </file>
   <file name="CFComapre.exe.config" size="1055">
@@ -152,4 +152,16 @@
       <dsig:DigestValue>6DatB1L4sPm2AkSX4eSaPzbYj6/DTNnxNoqcv8wPRRE=</dsig:DigestValue>
     </hash>
   </file>
-<publisherIdentity name="CN=SMART421\rbowden" issuerKeyHash="22bd65b2f54713dd48b0424b7732751024560b77" /><Signature Id="StrongNameSignature" xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /><SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha256" /><Reference URI=""><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" /><Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /></Transforms><DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" /><DigestValue>UzllgUhQkXCIsnlGpg/vl3tqSP5Sptzgb8PURAHhqIk=</DigestValue></Reference></SignedInfo><SignatureValue>mmXaqRW7cihFMg7IdkR8byCGwmzYmXyzVvC+qnMIDPyv4vd2kBMPBx+Fd9KS30qjojT/X6kiX2I+cOsblQXFvmlGS4TZkGh0L0aYcOAVBpBPxqy6da1WRHFBR1/aEC2YIwNQwf/sq2qlyu6+jwIoJ4eIQsdKHHKiqthm3rE8Qpo=</SignatureValue><KeyInfo Id="StrongNameKeyInfo"><KeyValue><RSAKeyValue><Modulus>r3f0qARu0cEodu2UvWtHa+hNSXajVvcdDLhWMRxMBDuTHr3qSBUB3+7mw86KHDwHggKI0If43dkY5kOVshJw5FfqLtCp48sC5n2FC6Cx0wh+5G0CpgtqkstofFJVJ56/d59pJc9YbcU74bK56VlLlhayhpntasNluRmn2K/bjRc=</Modulus><Exponent>AQAB</Exponent></RSAKeyValue></KeyValue><msrel:RelData xmlns:msrel="http://schemas.microsoft.com/windows/rel/2005/reldata"><r:license xmlns:r="urn:mpeg:mpeg21:2003:01-REL-R-NS" xmlns:as="http://schemas.microsoft.com/windows/pki/2005/Authenticode"><r:grant><as:ManifestInformation Hash="89a8e10144d4c36fe0dca652fe486a7b97ef0fa64679b2887091504881653953" Description="" Url=""><as:assemblyIdentity name="CFComapre.exe" version="1.0.0.0" publicKeyToken="bad0b76ede26719f" language="neutral" processorArchitecture="msil" type="win32" /></as:ManifestInformation><as:SignedBy /><as:AuthenticodePublisher><as:X509SubjectName>CN=SMART421\rbowden</as:X509SubjectName></as:AuthenticodePublisher></r:grant><r:issuer><Signature Id="AuthenticodeSignature" xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /><SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha256" /><Reference URI=""><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" /><Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /></Transforms><DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" /><DigestValue>/F2wUky/2Lx9OF9vaGMq0X+t93yNBMT903VxliQy/wU=</DigestValue></Reference></SignedInfo><SignatureValue>Wm5HJSznLTzmNViUTlOYPucr/5fSwBsuVn22nB1nSiamCHtqQnm/Ud6io8JvaMPh9DZPBu0pHwzgFUlh3INZKZh616IOOWMBl0h7JMfcaYZ3lSr2NeQZfjcVa428qV/AnSCrNy4tS+W13b54ipmYgkxQryEUiMoh8qg/2+rAdgo=</SignatureValue><KeyInfo><KeyValue><RSAKeyValue><Modulus>r3f0qARu0cEodu2UvWtHa+hNSXajVvcdDLhWMRxMBDuTHr3qSBUB3+7mw86KHDwHggKI0If43dkY5kOVshJw5FfqLtCp48sC5n2FC6Cx0wh+5G0CpgtqkstofFJVJ56/d59pJc9YbcU74bK56VlLlhayhpntasNluRmn2K/bjRc=</Modulus><Exponent>AQAB</Exponent></RSAKeyValue></KeyValue><X509Data><X509Certificate>MIIB2TCCAUKgAwIBAgIQTHYGCysWwp9PBE5jGVEy6jANBgkqhkiG9w0BAQsFADArMSkwJwYDVQQDHiAAUwBNAEEAUgBUADQAMgAxAFwAcgBiAG8AdwBkAGUAbjAeFw0xNzAxMjAxNDI1NTZaFw0xODAxMjAyMDI1NTZaMCsxKTAnBgNVBAMeIABTAE0AQQBSAFQANAAyADEAXAByAGIAbwB3AGQAZQBuMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCvd/SoBG7RwSh27ZS9a0dr6E1JdqNW9x0MuFYxHEwEO5MevepIFQHf7ubDzoocPAeCAojQh/jd2RjmQ5WyEnDkV+ou0KnjywLmfYULoLHTCH7kbQKmC2qSy2h8UlUnnr93n2klz1htxTvhsrnpWUuWFrKGme1qw2W5GafYr9uNFwIDAQABMA0GCSqGSIb3DQEBCwUAA4GBADJ0hmUelxcSiXz+SgGuuSKS0O4c+5yuyybYeVyIQaXJAvp1z2qrNi7Ay96YkNAAKg9oKkUgoqST0m++7p2lV3uhU9Jc3ywbEAEtBRXDKnMBeyRMaRs2Rca9loJR7sQHA/G2O1VCVHIRzD6A9j6SecirZbzdV9qFRXHvCbX0PJHf</X509Certificate></X509Data></KeyInfo></Signature></r:issuer></r:license></msrel:RelData></KeyInfo></Signature></asmv1:assembly>
+  <compatibility xmlns="urn:schemas-microsoft-com:compatibility.v1">
+    <application>
+      <!-- A list of all Windows versions that this application is designed to work with. 
+      Windows will automatically select the most compatible environment.-->
+      <!-- If your application is designed to work with Windows Vista, uncomment the following supportedOS node-->
+      <!--<supportedOS Id="{e2011457-1546-43c5-a5fe-008deee3d3f0}"></supportedOS>-->
+      <!-- If your application is designed to work with Windows 7, uncomment the following supportedOS node-->
+      <!--<supportedOS Id="{35138b9a-5d96-4fbd-8e2d-a2440225f93a}"/>-->
+      <!-- If your application is designed to work with Windows 8, uncomment the following supportedOS node-->
+      <!--<supportedOS Id="{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}"></supportedOS>-->
+    </application>
+  </compatibility>
+<publisherIdentity name="CN=SMART421\rbowden" issuerKeyHash="22bd65b2f54713dd48b0424b7732751024560b77" /><Signature Id="StrongNameSignature" xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /><SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha256" /><Reference URI=""><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" /><Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /></Transforms><DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" /><DigestValue>MOxlKIEy067Q2ILsdnLjM4rBn7o4DZAoKVDOdEOal6A=</DigestValue></Reference></SignedInfo><SignatureValue>Fq9RSIuVwz31/8Nkd2sJ7is5/ewRTMtnCTjPnzac5//0sTcEsgh2paURUdEXlVhIplujdqUfpbG2RtYrUjQLURAAlHhyQBJkdXZSRRvVPWOZYt82ODscijVkqKx46M3xAm1L+oXY+fZVo/iTeY1UQmnl1FaNOqcewvnsbUXKH9M=</SignatureValue><KeyInfo Id="StrongNameKeyInfo"><KeyValue><RSAKeyValue><Modulus>r3f0qARu0cEodu2UvWtHa+hNSXajVvcdDLhWMRxMBDuTHr3qSBUB3+7mw86KHDwHggKI0If43dkY5kOVshJw5FfqLtCp48sC5n2FC6Cx0wh+5G0CpgtqkstofFJVJ56/d59pJc9YbcU74bK56VlLlhayhpntasNluRmn2K/bjRc=</Modulus><Exponent>AQAB</Exponent></RSAKeyValue></KeyValue><msrel:RelData xmlns:msrel="http://schemas.microsoft.com/windows/rel/2005/reldata"><r:license xmlns:r="urn:mpeg:mpeg21:2003:01-REL-R-NS" xmlns:as="http://schemas.microsoft.com/windows/pki/2005/Authenticode"><r:grant><as:ManifestInformation Hash="a0979a4374ce502928900d38ba9fc18a33e37276ec82d8d0aed332812865ec30" Description="" Url=""><as:assemblyIdentity name="CFComapre.exe" version="1.0.0.0" publicKeyToken="bad0b76ede26719f" language="neutral" processorArchitecture="msil" type="win32" /></as:ManifestInformation><as:SignedBy /><as:AuthenticodePublisher><as:X509SubjectName>CN=SMART421\rbowden</as:X509SubjectName></as:AuthenticodePublisher></r:grant><r:issuer><Signature Id="AuthenticodeSignature" xmlns="http://www.w3.org/2000/09/xmldsig#"><SignedInfo><CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /><SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha256" /><Reference URI=""><Transforms><Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature" /><Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#" /></Transforms><DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" /><DigestValue>lZKhVQtL7CAKbABYjmOoCmbj2gRd47mRuWLLAX06inY=</DigestValue></Reference></SignedInfo><SignatureValue>ohvFVfbP0l9LdVatPrCt1s9EYAuMzpIoJin+TOEQ0rSaSpXi2aIpkJxwxLjGCnn6N9OXdm8CWzL7hNwRxq2GjZq1K3w2MP/Z2yzo13jbjZEjQIVMrf+HEAvazAiChnkZrQcHrjt3GOJ8RVUVE7IJ9Ecb63neH4Ydj8E7m6pPouM=</SignatureValue><KeyInfo><KeyValue><RSAKeyValue><Modulus>r3f0qARu0cEodu2UvWtHa+hNSXajVvcdDLhWMRxMBDuTHr3qSBUB3+7mw86KHDwHggKI0If43dkY5kOVshJw5FfqLtCp48sC5n2FC6Cx0wh+5G0CpgtqkstofFJVJ56/d59pJc9YbcU74bK56VlLlhayhpntasNluRmn2K/bjRc=</Modulus><Exponent>AQAB</Exponent></RSAKeyValue></KeyValue><X509Data><X509Certificate>MIIB2TCCAUKgAwIBAgIQTHYGCysWwp9PBE5jGVEy6jANBgkqhkiG9w0BAQsFADArMSkwJwYDVQQDHiAAUwBNAEEAUgBUADQAMgAxAFwAcgBiAG8AdwBkAGUAbjAeFw0xNzAxMjAxNDI1NTZaFw0xODAxMjAyMDI1NTZaMCsxKTAnBgNVBAMeIABTAE0AQQBSAFQANAAyADEAXAByAGIAbwB3AGQAZQBuMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCvd/SoBG7RwSh27ZS9a0dr6E1JdqNW9x0MuFYxHEwEO5MevepIFQHf7ubDzoocPAeCAojQh/jd2RjmQ5WyEnDkV+ou0KnjywLmfYULoLHTCH7kbQKmC2qSy2h8UlUnnr93n2klz1htxTvhsrnpWUuWFrKGme1qw2W5GafYr9uNFwIDAQABMA0GCSqGSIb3DQEBCwUAA4GBADJ0hmUelxcSiXz+SgGuuSKS0O4c+5yuyybYeVyIQaXJAvp1z2qrNi7Ay96YkNAAKg9oKkUgoqST0m++7p2lV3uhU9Jc3ywbEAEtBRXDKnMBeyRMaRs2Rca9loJR7sQHA/G2O1VCVHIRzD6A9j6SecirZbzdV9qFRXHvCbX0PJHf</X509Certificate></X509Data></KeyInfo></Signature></r:issuer></r:license></msrel:RelData></KeyInfo></Signature></asmv1:assembly>
