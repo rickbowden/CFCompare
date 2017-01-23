@@ -21,8 +21,7 @@ namespace CFComapre
             this.labelCopyright.Text = AssemblyCopyright;
             this.labelCompanyName.Text = AssemblyCompany;
             this.textBoxDescription.Text = AssemblyDescription;
-            
-            //this.labelEmail.Text = Properties.Settings.Default["AuthorEmail"];
+            this.textBoxDescription.Text += "." + Environment.NewLine + Environment.NewLine + "Author: " + Properties.Settings.Default["Author"] + Environment.NewLine + "Email: " + Properties.Settings.Default["AuthorEmail"];
         }
 
         #region Assembly Attribute Accessors
@@ -108,6 +107,11 @@ namespace CFComapre
         private void okButton_Click(object sender, EventArgs e)
         {
             this.Close();
+        }
+
+        private void tableLayoutPanel_Paint(object sender, PaintEventArgs e)
+        {
+
         }
     }
 }
