@@ -50,6 +50,7 @@ namespace CFComapre
         RichTextBox richTextBox2temp = new RichTextBox();
 
         public static Dictionary<string, string> Protocols = Utils.Protocol();
+        
 
         public App()
         {

@@ -406,12 +406,47 @@ namespace CFComapre
         }
 
 
+        static DescribeSecurityGroupsResponse GetSecurityGroup(AmazonEC2Client ec2Client, DescribeSecurityGroupsRequest request)
+        {
+            DescribeSecurityGroupsResponse sg = null;
+            try
+            {
+                sg = ec2Client.DescribeSecurityGroups(request);
+            }
+            catch (Exception)
+            {
+
+            }
+            return sg;
+        }
+
+
         public static void ProcessEC2SecurityGroupFromAWS(StackResource resource, CFStack stack, AmazonEC2Client ec2Client, Dictionary<string, string> secGroupMap)
         {
             DescribeSecurityGroupsRequest secGroupRequest = new DescribeSecurityGroupsRequest();
+            //Set request to use Phisical Id
             secGroupRequest.GroupIds = new List<string> { resource.PhysicalResourceId };
 
-            DescribeSecurityGroupsResponse response = ec2Client.DescribeSecurityGroups(secGroupRequest);
+            //Attempt to get security group using physical Id
+            DescribeSecurityGroupsResponse response = GetSecurityGroup(ec2Client, secGroupRequest);
+            
+            if (response == null)
+            {
+                //Set request to use Logical Id and Stack Name Tags
+                secGroupRequest.GroupIds.Clear();
+                List<Filter> f = new List<Filter>();
+                f.Add(new Filter { Name = "tag:aws:cloudformation:logical-id", Values = new List<string>() {resource.LogicalResourceId}});
+                f.Add(new Filter { Name = "tag:aws:cloudformation:stack-name", Values = new List<string>() { resource.StackName }});                
+                secGroupRequest.Filters = f;
+                //Attempt to get security group using logical Id
+                response = GetSecurityGroup(ec2Client, secGroupRequest);
+            }
+
+            if (response == null | response.SecurityGroups.Count == 0)
+            {
+                return;
+            }
+
             foreach (SecurityGroup group in response.SecurityGroups)
             {       
                 EC2SecurityGroup sg = new EC2SecurityGroup();                
@@ -432,9 +467,7 @@ namespace CFComapre
                         sgi.IpProtocol = FormatProtocol(perms.IpProtocol);
                         //--------------------------------------------------------------------
 
-                        //FormatPortRange - Port range could be 0-0 -1-1 0-65535
-                        //sgi.FromPort = perms.FromPort.ToString();
-                        //sgi.ToPort = perms.ToPort.ToString();
+                        //FormatPortRange - Port range could be 0-0 -1-1 0-65535                        
                         string from = "";
                         string to = "";
                         FormatPortRange(perms.FromPort.ToString(), perms.ToPort.ToString(), out from, out to);
@@ -454,9 +487,7 @@ namespace CFComapre
                         sgi.IpProtocol = FormatProtocol(perms.IpProtocol);
                         //--------------------------------------------------------------------
 
-                        //FormatPortRange - Port range could be 0-0 -1-1 0-65535
-                        //sgi.FromPort = perms.FromPort.ToString();
-                        //sgi.ToPort = perms.ToPort.ToString();
+                        //FormatPortRange - Port range could be 0-0 -1-1 0-65535                        
                         string from = "";
                         string to = "";
                         FormatPortRange(perms.FromPort.ToString(), perms.ToPort.ToString(), out from, out to);
