@@ -262,6 +262,7 @@ namespace CFComapre
             
             var template = JsonConvert.DeserializeObject<dynamic>(jsonString);
             stack.Description = template.Description;
+            var r = template.Resources;
             //Process StackResources            
             AWSUtils.ProcessTemplateResources(template.Resources, stack);
             stack.Resources.Sort((a, b) => a.LogicalId.CompareTo(b.LogicalId));
@@ -271,8 +272,33 @@ namespace CFComapre
         }
 
 
+        //private ListStackResourcesResponse ListStackResources(string stackName, AmazonCloudFormationClient cfClient, string nextToken = null)
+        //{
+        //    ListStackResourcesRequest lr = new ListStackResourcesRequest();
+        //    lr.StackName = stackName;
+        //    lr.NextToken = nextToken;
+        //    ListStackResourcesResponse liveStackResources = cfClient.ListStackResources(lr);
+        //    return liveStackResources;
+        //}
+
         private void ProcessLiveStack(string stackName, AmazonCloudFormationClient cfClient, AmazonEC2Client ec2Client, RichTextBox rtb, CFStack stack)
-        {            
+        {
+            Dictionary<string, string> secGroupMap = new Dictionary<string, string>();
+            DescribeSecurityGroupsRequest secGroupRequestAll = new DescribeSecurityGroupsRequest();
+            //Get all security group Id's and cf logicalId's (if any)
+            DescribeSecurityGroupsResponse secGroupResponseAll = ec2Client.DescribeSecurityGroups(secGroupRequestAll);
+            foreach (SecurityGroup sg in secGroupResponseAll.SecurityGroups)
+            {
+                string value = "none";
+                foreach (Amazon.EC2.Model.Tag tag in sg.Tags)
+                {
+                    if (tag.Key.Contains("aws:cloudformation:logical-id")) { value = tag.Value; }
+                }
+                secGroupMap.Add(sg.GroupId, value);
+            }
+            
+            
+            
             //Get Live Stack
             DescribeStacksRequest cfRequest = new DescribeStacksRequest();
             cfRequest.StackName = stackName;
@@ -280,51 +306,47 @@ namespace CFComapre
             stack.Description = liveStack.Stacks[0].Description;
             
             //Get Stack Resouces
-            DescribeStackResourcesRequest cfResourcesRequest = new DescribeStackResourcesRequest();
-            cfResourcesRequest.StackName = stackName;
-            DescribeStackResourcesResponse liveStackResources = cfClient.DescribeStackResources(cfResourcesRequest);
+            //Need to use ListStackResourcesRequest to be able to get stacks with more than 100 resources
+            ListStackResourcesRequest lr = new ListStackResourcesRequest();
+            lr.StackName = stackName;
+            ListStackResourcesResponse liveStackResources = cfClient.ListStackResources(lr);
 
-            Dictionary<string, string> secGroupMap = new Dictionary<string, string>();
-            var x = liveStackResources.StackResources.Find(n => n != null && n.ResourceType == "AWS::EC2::SecurityGroup");
-            if (x != null)
-            {
-                //Get SecurityGroups and map id to name
-                
-                DescribeSecurityGroupsRequest secGroupRequestAll = new DescribeSecurityGroupsRequest();
-                
-                //Get all security group Id's and cf logicalId's (if any)
-                DescribeSecurityGroupsResponse secGroupResponseAll = ec2Client.DescribeSecurityGroups(secGroupRequestAll);
-                foreach (SecurityGroup sg in secGroupResponseAll.SecurityGroups)
-                {
-                    string value = "none";
-                    foreach (Amazon.EC2.Model.Tag tag in sg.Tags)
-                    {
-                        if (tag.Key.Contains("aws:cloudformation:logical-id")) { value = tag.Value; }
-                    }
-                    secGroupMap.Add(sg.GroupId, value);
-                }
-            }
+            ProcessLiveStackResourcess(liveStackResources, stack, ec2Client, secGroupMap, stackName, cfClient);
+                     
 
-            foreach (StackResource liveStackResource in liveStackResources.StackResources)
+            stack.Resources.Sort((a, b) => a.LogicalId.CompareTo(b.LogicalId));
+
+            WriteOutput(stack, rtb, source1_CB.Text, templateOrStack1_TB.Text);
+        }
+
+
+        private void ProcessLiveStackResourcess(ListStackResourcesResponse liveStackResources, CFStack stack, AmazonEC2Client ec2Client, Dictionary<string, string> secGroupMap, string stackName, AmazonCloudFormationClient cfClient)
+        {
+            foreach (StackResourceSummary liveStackResource in liveStackResources.StackResourceSummaries)
             {
                 switch (liveStackResource.ResourceType)
                 {
                     case "AWS::EC2::SecurityGroup":
-                        AWSUtils.ProcessEC2SecurityGroupFromAWS(liveStackResource, stack, ec2Client, secGroupMap);
+                        AWSUtils.ProcessEC2SecurityGroupFromAWS(liveStackResource, stack, ec2Client, secGroupMap, stackName);
                         break;
                     case "AWS::EC2::NetworkAcl":
-                        AWSUtils.ProcessNetworkAclFromAWS(liveStackResource, stack, ec2Client);
+                        AWSUtils.ProcessNetworkAclFromAWS(liveStackResource, stack, ec2Client, stackName);
                         break;
                     default:
                         break;
                 }
 
             }
-            stack.Resources.Sort((a, b) => a.LogicalId.CompareTo(b.LogicalId));
 
-            WriteOutput(stack, rtb, source1_CB.Text, templateOrStack1_TB.Text);
+            if (liveStackResources.NextToken != null)
+            {
+                ListStackResourcesRequest lr = new ListStackResourcesRequest();
+                lr.StackName = stackName;
+                lr.NextToken = liveStackResources.NextToken;
+                liveStackResources = cfClient.ListStackResources(lr);
+                ProcessLiveStackResourcess(liveStackResources, stack, ec2Client, secGroupMap, stackName, cfClient);
+            }
         }
-
 
 
         private void WriteOutput(CFStack s, RichTextBox rtb, string source, string name)

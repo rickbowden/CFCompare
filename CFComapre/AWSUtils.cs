@@ -43,11 +43,12 @@ namespace CFComapre
 
         public static void ProcessTemplateResources(dynamic input, CFStack stack)
         {
-
+           
             foreach (var resource in input)
             {
                 string logicalId = resource.Name;
 
+                
                 switch ((string)resource.Value["Type"])
                 {
                     case "AWS::IAM::User":
@@ -193,7 +194,7 @@ namespace CFComapre
         static void ProcessEC2SecurityGroupIngressFromTemplate(dynamic input, CFStack stack)
         {
             EC2SecurityGroupIngress sgi = new EC2SecurityGroupIngress();
-
+                                    
             var rule = input.Value["Properties"];
 
             //FormatProtocol - Protocol could be a number or text (e.g. 6 or tcp)                         
@@ -214,9 +215,16 @@ namespace CFComapre
                 if (rule.SourceSecurityGroupId != null)
                 {
                     var Ids = rule.SourceSecurityGroupId;
-                    foreach (var Id in Ids)
+                    if (Ids.Value == null)
                     {
-                        sgi.SourceSecurityGroupId = Id.Value;
+                        foreach (var Id in Ids)
+                        {
+                            sgi.SourceSecurityGroupId = Id.Value;
+                        }
+                    }
+                    else
+                    {
+                        sgi.SourceSecurityGroupId = Ids.Value;
                     }
                 }
             }
@@ -240,7 +248,7 @@ namespace CFComapre
         }
         
         static void ProcessEC2SecurityGroupFromTemplate(dynamic input, CFStack stack)
-        {
+        {            
             EC2SecurityGroup sg = new EC2SecurityGroup();
 
             sg.LogicalId = input.Name;
@@ -249,10 +257,16 @@ namespace CFComapre
             var props = input.Value["Properties"];
             foreach (var prop in props)
             {
+                //Attempt to deal with values that are calculated using CloudFormation functions like Join.
+                if (prop.Value.ToString().Contains("Fn::"))
+                {
+                    prop.Value = "Calulated value";
+                }
+
                 switch ((string)prop.Name)
                 {
                     case "GroupDescription":
-                        sg.Properties.GroupDescription = prop.Value;
+                        sg.Properties.GroupDescription = prop.Value.ToString();
                         break;
                     case "VpcId":
                         var a = prop.Value;
@@ -263,7 +277,7 @@ namespace CFComapre
                         break;
                     case "SecurityGroupIngress":
                         var ingressRules = prop.Value;
-                        
+
                         foreach (var rule in ingressRules)
                         {
                             EC2SecurityGroupIngress sgi = new EC2SecurityGroupIngress();
@@ -296,6 +310,8 @@ namespace CFComapre
             }
 
             stack.Resources.Add(sg);
+            
+            
         }
         
         static void ProcessIAMUserFromTemplate(dynamic input, CFStack stack)
@@ -345,7 +361,7 @@ namespace CFComapre
         // -----------------------------------------------------------------------
         // Live Stack
 
-        public static void ProcessNetworkAclFromAWS(StackResource resource, CFStack stack, AmazonEC2Client ec2Client)
+        public static void ProcessNetworkAclFromAWS(StackResourceSummary resource, CFStack stack, AmazonEC2Client ec2Client, string stackName)
         {
             DescribeNetworkAclsRequest naclRequest = new DescribeNetworkAclsRequest();
             naclRequest.NetworkAclIds = new List<string> { resource.PhysicalResourceId };
@@ -421,7 +437,7 @@ namespace CFComapre
         }
 
 
-        public static void ProcessEC2SecurityGroupFromAWS(StackResource resource, CFStack stack, AmazonEC2Client ec2Client, Dictionary<string, string> secGroupMap)
+        public static void ProcessEC2SecurityGroupFromAWS(StackResourceSummary resource, CFStack stack, AmazonEC2Client ec2Client, Dictionary<string, string> secGroupMap, string stackName)
         {
             DescribeSecurityGroupsRequest secGroupRequest = new DescribeSecurityGroupsRequest();
             //Set request to use Phisical Id
@@ -435,8 +451,8 @@ namespace CFComapre
                 //Set request to use Logical Id and Stack Name Tags
                 secGroupRequest.GroupIds.Clear();
                 List<Filter> f = new List<Filter>();
-                f.Add(new Filter { Name = "tag:aws:cloudformation:logical-id", Values = new List<string>() {resource.LogicalResourceId}});
-                f.Add(new Filter { Name = "tag:aws:cloudformation:stack-name", Values = new List<string>() { resource.StackName }});                
+                f.Add(new Filter { Name = "tag:aws:cloudformation:logical-id", Values = new List<string>() { resource.LogicalResourceId }});
+                f.Add(new Filter { Name = "tag:aws:cloudformation:stack-name", Values = new List<string>() { stackName }});                
                 secGroupRequest.Filters = f;
                 //Attempt to get security group using logical Id
                 response = GetSecurityGroup(ec2Client, secGroupRequest);
