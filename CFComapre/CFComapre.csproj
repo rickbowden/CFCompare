@@ -87,6 +87,12 @@
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\..\..\..\..\Downloads\Json90r1\Bin\Net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="rab_base">
+      <HintPath>..\..\..\_My_CLASSES\rab_Classes\rab_base\bin\Release\rab_base.dll</HintPath>
+    </Reference>
+    <Reference Include="rab_update">
+      <HintPath>..\..\..\_My_CLASSES\rab_Classes\rab_update\bin\Release\rab_update.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />

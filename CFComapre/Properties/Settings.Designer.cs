@@ -40,5 +40,100 @@ namespace CFComapre.Properties {
                 return ((string)(this["AuthorEmail"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute(@"<?xml version=""1.0"" encoding=""utf-16""?>
+<ArrayOfString xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
+  <string>ap-northeast-1</string>
+  <string>ap-northeast-2</string>
+  <string>ap-southeast-1</string>
+  <string>ap-southeast-2</string>
+  <string>ap-south-1</string>
+  <string>ca-central-1</string>
+  <string>eu-central-1</string>
+  <string>eu-west-1</string>
+  <string>eu-west-2</string>
+  <string>sa-east-1</string>
+  <string>us-east-1</string>
+  <string>us-east-2</string>
+  <string>us-west-1</string>
+  <string>us-west-2</string>
+</ArrayOfString>")]
+        public global::System.Collections.Specialized.StringCollection AWSRegion {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["AWSRegion"]));
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("eu-west-1")]
+        [global::System.Configuration.SettingsManageabilityAttribute(global::System.Configuration.SettingsManageability.Roaming)]
+        public string AWSDefaultRegion {
+            get {
+                return ((string)(this["AWSDefaultRegion"]));
+            }
+            set {
+                this["AWSDefaultRegion"] = value;
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.1")]
+        public string Version {
+            get {
+                return ((string)(this["Version"]));
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.SettingsManageabilityAttribute(global::System.Configuration.SettingsManageability.Roaming)]
+        public string VersionsToIgnore {
+            get {
+                return ((string)(this["VersionsToIgnore"]));
+            }
+            set {
+                this["VersionsToIgnore"] = value;
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://github.com/rickbowden/CFCompare/releases/latest")]
+        public string UpdateUrl {
+            get {
+                return ((string)(this["UpdateUrl"]));
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        [global::System.Configuration.SettingsManageabilityAttribute(global::System.Configuration.SettingsManageability.Roaming)]
+        public bool UpgradeRequired {
+            get {
+                return ((bool)(this["UpgradeRequired"]));
+            }
+            set {
+                this["UpgradeRequired"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.SettingsManageabilityAttribute(global::System.Configuration.SettingsManageability.Roaming)]
+        public string VersionsRemindDate {
+            get {
+                return ((string)(this["VersionsRemindDate"]));
+            }
+            set {
+                this["VersionsRemindDate"] = value;
+            }
+        }
     }
 }

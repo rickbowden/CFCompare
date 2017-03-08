@@ -21,7 +21,13 @@ namespace CFComapre
 {
     public partial class App : Form
     {
-                    
+        //Application Default Properties
+        static string UpdateUrl = Properties.Settings.Default.UpdateUrl;
+        static double ThisVersion = Convert.ToDouble(Properties.Settings.Default.Version);
+        static string UserName = Environment.UserName;
+        static string AppName = "EC2Info";
+        //-------------------------------
+
         string templatePath1 = "";
         string profileName1 = "";
         string jasonString1 = "";
@@ -56,16 +62,35 @@ namespace CFComapre
         {
             InitializeComponent();
 
-            validation1_LB.Visible = false;
-            validation2_LB.Visible = false;
-            AWSConfigs.AWSRegion = "eu-west-1";
-            PopulateProfileList(profile1_CB);
-            PopulateProfileList(profile2_CB);
-            SwitchView_BTN.Enabled = false;
+            try
+            {
+                //Application Upgrade
+                if (Properties.Settings.Default.UpgradeRequired)
+                {
+                    Properties.Settings.Default.Upgrade();
+                    Properties.Settings.Default.UpgradeRequired = false;
+                    Properties.Settings.Default.Save();
+                }
+                //-------------------
+                
+                validation1_LB.Visible = false;
+                validation2_LB.Visible = false;
+                AWSConfigs.AWSRegion = "eu-west-1";
+                PopulateProfileList(profile1_CB);
+                PopulateProfileList(profile2_CB);
+                SwitchView_BTN.Enabled = false;
+            }
+            catch (Exception ex)
+            {
+                DisplayError(ex.Message);
+            }
             
         }
 
-
+        void DisplayError(string message)
+        {
+            MessageBox.Show(message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1);
+        }
 
 
         private void source1_CB_SelectedIndexChanged(object sender, EventArgs e)
@@ -783,6 +808,35 @@ namespace CFComapre
             versionInfo.Show();
         }
 
+
+
+        //Application Upgarde Code Block
+        private void backgroundWorkerUpdate_DoWork(object sender, DoWorkEventArgs e)
+        {
+            try
+            {
+                rab_update.Version v = new rab_update.Version(Properties.Settings.Default.Version, Properties.Settings.Default.UpdateUrl);
+                v.CheckForNewVersion();
+                e.Result = v;
+            }
+            catch (Exception ex)
+            {
+                DisplayError("Error during update check." + Environment.NewLine + ex.Message);
+            }
+        }
+        private void backgroundWorkerUpdate_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (e.Result is rab_update.Version)
+            {
+                rab_update.Version v = e.Result as rab_update.Version;
+                if (v.UpdateAvailable)
+                {
+                    rab_update.UpdateForm uf = new rab_update.UpdateForm(v.NewVersionString, v.CurrentVersion, v.DownloadUrl, AppName);
+                    uf.ShowDialog();
+                }
+            }
+        }
+        //------------------------------
     }
 
     public static class ExtensionMethods

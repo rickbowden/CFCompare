@@ -61,6 +61,10 @@
             this.SwitchView_BTN = new System.Windows.Forms.ToolStripButton();
             this.validateTemplate_CB = new System.Windows.Forms.CheckBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.backgroundWorkerUpdate = new System.ComponentModel.BackgroundWorker();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripMenuLabel1 = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
@@ -87,29 +91,33 @@
             // toolStripMenuItem_Options
             // 
             this.toolStripMenuItem_Options.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripSeparator2,
+            this.toolStripMenuLabel1,
             this.toolStripMenuItem_CompareRemove,
-            this.toolStripMenuItem_CompareHighlight});
+            this.toolStripMenuItem_CompareHighlight,
+            this.toolStripSeparator1});
             this.toolStripMenuItem_Options.Name = "toolStripMenuItem_Options";
             this.toolStripMenuItem_Options.Size = new System.Drawing.Size(73, 24);
             this.toolStripMenuItem_Options.Text = "Options";
             // 
             // toolStripMenuItem_CompareRemove
             // 
-            this.toolStripMenuItem_CompareRemove.Checked = true;
             this.toolStripMenuItem_CompareRemove.CheckOnClick = true;
-            this.toolStripMenuItem_CompareRemove.CheckState = System.Windows.Forms.CheckState.Checked;
             this.toolStripMenuItem_CompareRemove.Name = "toolStripMenuItem_CompareRemove";
-            this.toolStripMenuItem_CompareRemove.Size = new System.Drawing.Size(237, 24);
-            this.toolStripMenuItem_CompareRemove.Text = "Remove on Comparison";
+            this.toolStripMenuItem_CompareRemove.Size = new System.Drawing.Size(253, 24);
+            this.toolStripMenuItem_CompareRemove.Text = "    Remove on Comparison";
+            this.toolStripMenuItem_CompareRemove.TextImageRelation = System.Windows.Forms.TextImageRelation.TextAboveImage;
             this.toolStripMenuItem_CompareRemove.ToolTipText = "Removes entries that are the same on both sides during the compare operation.";
             this.toolStripMenuItem_CompareRemove.Click += new System.EventHandler(this.toolStripMenuItem_CompareRemove_Click);
             // 
             // toolStripMenuItem_CompareHighlight
             // 
+            this.toolStripMenuItem_CompareHighlight.Checked = true;
             this.toolStripMenuItem_CompareHighlight.CheckOnClick = true;
+            this.toolStripMenuItem_CompareHighlight.CheckState = System.Windows.Forms.CheckState.Checked;
             this.toolStripMenuItem_CompareHighlight.Name = "toolStripMenuItem_CompareHighlight";
-            this.toolStripMenuItem_CompareHighlight.Size = new System.Drawing.Size(237, 24);
-            this.toolStripMenuItem_CompareHighlight.Text = "Highlight on Compare";
+            this.toolStripMenuItem_CompareHighlight.Size = new System.Drawing.Size(253, 24);
+            this.toolStripMenuItem_CompareHighlight.Text = "    Highlight on Compare";
             this.toolStripMenuItem_CompareHighlight.ToolTipText = "Highlights entries that are the same on both sides during the compare operation.";
             this.toolStripMenuItem_CompareHighlight.Click += new System.EventHandler(this.toolStripMenuItem_CompareHighlight_Click);
             // 
@@ -398,6 +406,29 @@
             this.validateTemplate_CB.Text = "Validate Template(s)";
             this.validateTemplate_CB.UseVisualStyleBackColor = true;
             // 
+            // backgroundWorkerUpdate
+            // 
+            this.backgroundWorkerUpdate.WorkerReportsProgress = true;
+            this.backgroundWorkerUpdate.WorkerSupportsCancellation = true;
+            this.backgroundWorkerUpdate.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorkerUpdate_DoWork);
+            this.backgroundWorkerUpdate.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorkerUpdate_RunWorkerCompleted);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(250, 6);
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(250, 6);
+            // 
+            // toolStripMenuLabel1
+            // 
+            this.toolStripMenuLabel1.Name = "toolStripMenuLabel1";
+            this.toolStripMenuLabel1.Size = new System.Drawing.Size(253, 24);
+            this.toolStripMenuLabel1.Text = "Comparison Options";
+            // 
             // App
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -458,6 +489,10 @@
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem_CompareHighlight;
         private System.Windows.Forms.ToolStripButton SwitchView_BTN;
         private System.Windows.Forms.ToolTip toolTip1;
+        private System.ComponentModel.BackgroundWorker backgroundWorkerUpdate;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuLabel1;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
     }
 }
 

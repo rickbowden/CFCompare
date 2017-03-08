@@ -8,5 +8,42 @@
     <Setting Name="AuthorEmail" Type="System.String" Scope="Application">
       <Value Profile="(Default)">apps@rickbowden.co.uk</Value>
     </Setting>
+    <Setting Name="AWSRegion" Type="System.Collections.Specialized.StringCollection" Scope="Application">
+      <Value Profile="(Default)">&lt;?xml version="1.0" encoding="utf-16"?&gt;
+&lt;ArrayOfString xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"&gt;
+  &lt;string&gt;ap-northeast-1&lt;/string&gt;
+  &lt;string&gt;ap-northeast-2&lt;/string&gt;
+  &lt;string&gt;ap-southeast-1&lt;/string&gt;
+  &lt;string&gt;ap-southeast-2&lt;/string&gt;
+  &lt;string&gt;ap-south-1&lt;/string&gt;
+  &lt;string&gt;ca-central-1&lt;/string&gt;
+  &lt;string&gt;eu-central-1&lt;/string&gt;
+  &lt;string&gt;eu-west-1&lt;/string&gt;
+  &lt;string&gt;eu-west-2&lt;/string&gt;
+  &lt;string&gt;sa-east-1&lt;/string&gt;
+  &lt;string&gt;us-east-1&lt;/string&gt;
+  &lt;string&gt;us-east-2&lt;/string&gt;
+  &lt;string&gt;us-west-1&lt;/string&gt;
+  &lt;string&gt;us-west-2&lt;/string&gt;
+&lt;/ArrayOfString&gt;</Value>
+    </Setting>
+    <Setting Name="AWSDefaultRegion" Roaming="true" Type="System.String" Scope="User">
+      <Value Profile="(Default)">eu-west-1</Value>
+    </Setting>
+    <Setting Name="Version" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">0.1</Value>
+    </Setting>
+    <Setting Name="VersionsToIgnore" Roaming="true" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="UpdateUrl" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">https://github.com/rickbowden/CFCompare/releases/latest</Value>
+    </Setting>
+    <Setting Name="UpgradeRequired" Roaming="true" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
+    <Setting Name="VersionsRemindDate" Roaming="true" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>
