@@ -15,7 +15,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Xml.Linq;
 
-namespace CFComapre
+namespace CFCompare
 {
     class Utils
     {

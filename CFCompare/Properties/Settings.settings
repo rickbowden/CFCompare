@@ -1,5 +1,5 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="CFComapre.Properties" GeneratedClassName="Settings">
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="CFCompare.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
     <Setting Name="Author" Type="System.String" Scope="Application">
@@ -31,7 +31,7 @@
       <Value Profile="(Default)">eu-west-1</Value>
     </Setting>
     <Setting Name="Version" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">0.1.0.0</Value>
+      <Value Profile="(Default)">0.1</Value>
     </Setting>
     <Setting Name="VersionsToIgnore" Roaming="true" Type="System.String" Scope="User">
       <Value Profile="(Default)" />

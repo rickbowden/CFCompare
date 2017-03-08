@@ -7,8 +7,8 @@
     <ProjectGuid>{F3A49668-11C0-47DE-9CBC-D4E8FDBE9A68}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CFComapre</RootNamespace>
-    <AssemblyName>CFComapre</AssemblyName>
+    <RootNamespace>CFCompare</RootNamespace>
+    <AssemblyName>CFCompare</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <IsWebBootstrapper>true</IsWebBootstrapper>
@@ -22,8 +22,8 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
-    <InstallUrl>https://raw.githubusercontent.com/rickbowden/CFCompare/master/CFComapre/publish/</InstallUrl>
-    <UpdateUrl>https://raw.githubusercontent.com/rickbowden/CFCompare/master/CFComapre/publish/</UpdateUrl>
+    <InstallUrl>https://raw.githubusercontent.com/rickbowden/CFCompare/master/CFCompare/publish/</InstallUrl>
+    <UpdateUrl>https://raw.githubusercontent.com/rickbowden/CFCompare/master/CFCompare/publish/</UpdateUrl>
     <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.0</ApplicationVersion>
@@ -54,10 +54,10 @@
     <ManifestCertificateThumbprint>5F8E2B3AD337A347956439BF59A2027004BB23A4</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>CFComapre_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>CFCompare_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
-    <GenerateManifests>true</GenerateManifests>
+    <GenerateManifests>false</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup>
     <SignManifests>true</SignManifests>
@@ -147,7 +147,7 @@
     <EmbeddedResource Include="TextForm.resx">
       <DependentUpon>TextForm.cs</DependentUpon>
     </EmbeddedResource>
-    <None Include="CFComapre_TemporaryKey.pfx" />
+    <None Include="CFCompare_TemporaryKey.pfx" />
     <None Include="Properties\app.manifest" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

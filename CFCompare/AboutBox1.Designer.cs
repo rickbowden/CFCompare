@@ -1,4 +1,4 @@
-﻿namespace CFComapre
+﻿namespace CFCompare
 {
     partial class AboutBox1
     {

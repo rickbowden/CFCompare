@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace CFComapre.Properties {
+namespace CFCompare.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace CFComapre.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("CFComapre.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("CFCompare.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -65,16 +65,18 @@ namespace CFComapre.Properties {
         ///
         ///Limitations:
         ///
-        ///	Only processes the following Template or Stack resources.
-        ///		Security Groups.
-        ///		Security Group Ingress Rules (Security Group must be defined in the template before any ingress rules).
-        ///		Does not process tags.
-        ///		NACLS.
-        ///		The NACL must be defined in the template before the Ingress or Egress rules.
+        ///	No Multithreading
+        ///		This app runs on a single thread so the user interface wil freeze while the resources are processed.
+        ///	
         ///
-        ///	Authentication
-        ///		Currently only uses AWS profiles stored in the AWS SDK Store for .NET.
-        ///		Cross account role access could be possible if required. [rest of string was truncated]&quot;;.
+        ///	Only processes the following Template or Stack resources.
+        ///
+        ///		Security Groups.
+        ///			The Security Group must be defined in the template before any ingress rules.
+        ///			If the physiacl resource Id is not found then the CF logical-id and stack-name tags are used to find the group.
+        ///			Does not process tags.
+        ///		NACLS.
+        ///			The NA [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string About {
             get {

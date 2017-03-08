@@ -17,7 +17,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace CFComapre
+namespace CFCompare
 {
     public partial class App : Form
     {
@@ -25,7 +25,7 @@ namespace CFComapre
         static string UpdateUrl = Properties.Settings.Default.UpdateUrl;
         static double ThisVersion = Convert.ToDouble(Properties.Settings.Default.Version);
         static string UserName = Environment.UserName;
-        static string AppName = "EC2Info";
+        static string AppName = "CFCompare";
         //-------------------------------
 
         string templatePath1 = "";

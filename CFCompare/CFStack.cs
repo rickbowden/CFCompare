@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CFComapre
+namespace CFCompare
 {
     [Serializable]
     class CFStack

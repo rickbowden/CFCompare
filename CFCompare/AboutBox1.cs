@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 
-namespace CFComapre
+namespace CFCompare
 {
     partial class AboutBox1 : Form
     {

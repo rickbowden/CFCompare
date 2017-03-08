@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("CFComapre")]
+[assembly: AssemblyTitle("CFCompare")]
 [assembly: AssemblyDescription("Compares a CloudFormation Template with Live AWS Stack")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("FPS")]
-[assembly: AssemblyProduct("CFComapre")]
+[assembly: AssemblyProduct("CFCompare")]
 [assembly: AssemblyCopyright("Copyright © RickBowden 2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
