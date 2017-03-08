@@ -5,13 +5,16 @@ Limitations:
 	No Multithreading
 		This app runs on a single thread so the user interface wil freeze while the resources are processed.
 	
+
 	Only processes the following Template or Stack resources.
+
 		Security Groups.
 			The Security Group must be defined in the template before any ingress rules.
 			If the physiacl resource Id is not found then the CF logical-id and stack-name tags are used to find the group.
 			Does not process tags.
 		NACLS.
 			The NACL must be defined in the template before the Ingress or Egress rules.
+
 
 	Authentication
 		Currently only uses AWS profiles stored in the AWS SDK Store for .NET.
@@ -20,4 +23,4 @@ Limitations:
 
 
 
-Version 1.0.0.0	- Initial release.
+Version 0.1.0.0	- Pre-Release.

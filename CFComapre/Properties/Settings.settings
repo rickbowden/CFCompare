@@ -31,7 +31,7 @@
       <Value Profile="(Default)">eu-west-1</Value>
     </Setting>
     <Setting Name="Version" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">0.1</Value>
+      <Value Profile="(Default)">0.1.0.0</Value>
     </Setting>
     <Setting Name="VersionsToIgnore" Roaming="true" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
