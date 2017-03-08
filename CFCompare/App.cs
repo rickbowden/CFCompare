@@ -75,10 +75,16 @@ namespace CFCompare
                 
                 validation1_LB.Visible = false;
                 validation2_LB.Visible = false;
-                AWSConfigs.AWSRegion = "eu-west-1";
+
+                //Set default region
+                AWSConfigs.AWSRegion = Properties.Settings.Default.AWSDefaultRegion;
+
                 PopulateProfileList(profile1_CB);
                 PopulateProfileList(profile2_CB);
                 SwitchView_BTN.Enabled = false;
+
+                //Check For Updates
+                CheckForUpdates();
             }
             catch (Exception ex)
             {
@@ -811,6 +817,17 @@ namespace CFCompare
 
 
         //Application Upgarde Code Block
+        void CheckForUpdates()
+        {
+            try
+            {
+                backgroundWorkerUpdate.RunWorkerAsync();
+            }
+            catch (Exception ex)
+            {
+                DisplayError("Error during update check." + Environment.NewLine + ex.Message);
+            }
+        }
         private void backgroundWorkerUpdate_DoWork(object sender, DoWorkEventArgs e)
         {
             try
